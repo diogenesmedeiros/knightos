@@ -1,4 +1,3 @@
-.vscode/
-build/
-isodir/
-knightos.iso
+/build
+/isodir
+/knightos.iso
