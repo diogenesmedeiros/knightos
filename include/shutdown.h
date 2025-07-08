@@ -1,0 +1,1 @@
+void cmd_shutdown(const char* _);

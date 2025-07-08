@@ -1,0 +1,1 @@
+void cmd_login(const char* name);
