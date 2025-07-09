@@ -1,16 +1,16 @@
-#include <command.h>
-#include <string.h>
-#include <user.h>
-#include <stddef.h>
-#include <terminal.h>
-#include "clear.h"
-#include "echo.h"
-#include "help.h"
-#include "login.h"
-#include "reboot.h"
-#include "shutdown.h"
-#include "useradd.h"
-#include "whoami.h"
+#include "command.h"
+#include "string.h"
+#include "user.h"
+#include "stddef.h"
+#include "terminal.h"
+#include "command_clear.h"
+#include "command_echo.h"
+#include "command_help.h"
+#include "command_login.h"
+#include "command_reboot.h"
+#include "command_shutdown.h"
+#include "command_useradd.h"
+#include "command_whoami.h"
 
 #define MAX_COMMANDS 32
 
