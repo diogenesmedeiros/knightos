@@ -1,5 +1,4 @@
-#include <terminal.h>
-#include <user.h>
+#include <commands/command_useradd.h>
 
 void cmd_useradd(const char* name) {
     while (*name == ' ') name++;

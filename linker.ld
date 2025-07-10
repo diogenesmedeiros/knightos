@@ -19,6 +19,9 @@ SECTIONS {
 
     .data : {
         *(.data)
+        KEEP(*(.rodata*))
+        _binary_disk_img_start = .;
+        *(.diskimg)
     }
 
     .bss : {

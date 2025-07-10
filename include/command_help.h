@@ -1,1 +1,0 @@
-void cmd_help(const char* _);

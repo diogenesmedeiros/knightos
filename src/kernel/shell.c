@@ -1,14 +1,19 @@
-#include "terminal.h"
-#include "string.h"
-#include "command.h"
-
-#define MAX_INPUT 256
+#include <kernel/shell.h>
 
 static char input_buffer[MAX_INPUT];
 static int input_pos = 0;
 
 void shell_prompt() {
-    terminal_print("knightos> ");
+    const char* userLogged = user_whoami();
+
+    if (strcmp(userLogged, "none") == 0) {
+        terminal_print("[knightos]$ ");
+    } else {
+        terminal_print("[");
+        terminal_print(userLogged);
+        terminal_print("]");
+        terminal_print("$ ");
+    }
 }
 
 void shell_execute(const char* cmd) {

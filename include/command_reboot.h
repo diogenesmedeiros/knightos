@@ -1,1 +1,0 @@
-void cmd_reboot(const char* _);

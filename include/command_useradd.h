@@ -1,1 +1,0 @@
-void cmd_useradd(const char* name);

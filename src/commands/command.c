@@ -1,18 +1,4 @@
-#include "command.h"
-#include "string.h"
-#include "user.h"
-#include "stddef.h"
-#include "terminal.h"
-#include "command_clear.h"
-#include "command_echo.h"
-#include "command_help.h"
-#include "command_login.h"
-#include "command_reboot.h"
-#include "command_shutdown.h"
-#include "command_useradd.h"
-#include "command_whoami.h"
-
-#define MAX_COMMANDS 32
+#include <commands/command.h>
 
 static Command commands[MAX_COMMANDS];
 static int command_count = 0;
@@ -34,7 +20,7 @@ void command_execute(const char* input) {
     }
     cmd[i] = '\0';
 
-    if (input[i] != ' ') {
+    if (input[i] == ' ') {
         args = input + i + 1;
         while (*args == ' ') args++;
     } else {
@@ -48,14 +34,15 @@ void command_execute(const char* input) {
         }
     }
 
-    terminal_print("Comando nao reconhecido.\n");
+    if (input != NULL && input[0] != '\0') {
+        terminal_print("Comando nao reconhecido.\n");
+    }
 }
 
 void command_list() {
     for (int i = 0; i < command_count; i++) {
-        terminal_print("- ");
         terminal_print(commands[i].name);
-        terminal_print(": ");
+        terminal_print("    ");
         terminal_print(commands[i].description);
         terminal_putc('\n');
     }

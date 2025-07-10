@@ -1,11 +1,18 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-#include <stdint.h>
-
 #define MULTIBOOT_MAGIC    0x1BADB002
 #define MULTIBOOT_FLAGS    0x00000003
 #define MULTIBOOT_CHECKSUM -(MULTIBOOT_MAGIC + MULTIBOOT_FLAGS)
+
+#include <stdint.h>
+#include <kernel/terminal.h>
+#include <kernel/shell.h>
+#include <kernel/memory.h>
+#include <kernel/user.h>
+#include <kernel/cpu.h>
+#include <drivers/keyboard.h>
+#include <lib/string.h>
 
 struct multiboot_header_t {
     uint32_t magic;
@@ -21,6 +28,5 @@ struct multiboot_header_t {
 extern const struct multiboot_header_t multiboot_header;
 
 void kernel_main(void);
-void print_char(int pos, char c);
 
 #endif

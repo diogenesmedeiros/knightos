@@ -1,5 +1,4 @@
-#include "user.h"
-#include <string.h>
+#include <kernel/user.h>
 
 static User users[MAX_USERS];
 static int user_count = 0;

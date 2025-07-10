@@ -1,5 +1,4 @@
-#include <terminal.h>
-#include <user.h>
+#include <commands/command_whoami.h>
 
 void cmd_whoami(const char* _) {
     (void)_;

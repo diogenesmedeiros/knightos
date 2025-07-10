@@ -1,1 +1,0 @@
-void cmd_whoami(const char* _);

@@ -4,6 +4,8 @@
 #define MAX_USERS 16
 #define MAX_USERNAME_LEN 32
 
+#include <lib/string.h>
+
 typedef struct {
     char name[MAX_USERNAME_LEN];
 } User;

@@ -1,1 +1,0 @@
-void cmd_clear(const char* _);

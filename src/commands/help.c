@@ -1,5 +1,4 @@
-#include <terminal.h>
-#include <command.h>
+#include <commands/command_help.h>
 
 void cmd_help(const char* _) {
     (void)_;

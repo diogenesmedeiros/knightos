@@ -1,5 +1,4 @@
-#include "string.h"
-#include <stddef.h>
+#include <lib/string.h>
 
 int strcmp(const char* a, const char* b) {
     while (*a && (*a == *b)) {
@@ -32,4 +31,32 @@ int strlen(const char* str) {
     int len = 0;
     while (str[len]) len++;
     return len;
+}
+
+char* strcpy(char* dest, const char* src) {
+    char* ret = dest;
+    while ((*dest++ = *src++));
+    return ret;
+}
+
+char* strcat(char *dest, const char *src) {
+    char *ptr = dest;
+    while (*ptr) ptr++;
+    while ((*ptr++ = *src++));
+    return dest;
+}
+
+void *memcpy(void *dest, const void *src, size_t n) {
+    uint8_t *d = dest;
+    const uint8_t *s = src;
+    for (size_t i = 0; i < n; i++)
+        d[i] = s[i];
+    return dest;
+}
+
+void *memset(void *s, int c, size_t n) {
+    uint8_t *p = s;
+    for (size_t i = 0; i < n; i++)
+        p[i] = (uint8_t)c;
+    return s;
 }

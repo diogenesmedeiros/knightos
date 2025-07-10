@@ -1,4 +1,4 @@
-#include <terminal.h>
+#include <commands/command_clear.h>
 
 void cmd_clear(const char* _) {
     (void)_;

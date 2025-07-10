@@ -1,6 +1,4 @@
-#include "terminal.h"
-#include "io.h"
-#include <stdint.h>
+#include <kernel/terminal.h>
 
 static uint16_t* const VGA_BUFFER = (uint16_t*)0xB8000;
 static const int VGA_WIDTH = 80;
