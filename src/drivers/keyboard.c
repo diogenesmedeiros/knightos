@@ -99,5 +99,38 @@ void keyboard_poll() {
     char c = scancode_to_char(scancode);
     if (!c || c == '?') return;
 
+    keyboard_put_char(c);
     shell_handle_char(c);
+}
+
+static char keyboard_buffer[KEYBOARD_BUFFER_SIZE];
+static int keyboard_buffer_index = 0;
+
+void keyboard_put_char(char c) {
+    if (keyboard_buffer_index < KEYBOARD_BUFFER_SIZE) {
+        keyboard_buffer[keyboard_buffer_index++] = c;
+    }
+}
+
+char keyboard_get_char() {
+    while (keyboard_buffer_index == 0);
+    char c = keyboard_buffer[0];
+    for (int i = 1; i < keyboard_buffer_index; i++) {
+        keyboard_buffer[i - 1] = keyboard_buffer[i];
+    }
+    keyboard_buffer_index--;
+    return c;
+}
+
+char keyboard_read_char_blocking() {
+    while (1) {
+        uint8_t scancode = inb(0x60);
+
+        if (scancode & 0x80) {
+            continue;
+        }
+
+        char c = scancode_to_char(scancode);
+        if (c) return c;
+    }
 }

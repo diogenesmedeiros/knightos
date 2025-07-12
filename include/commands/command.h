@@ -16,6 +16,14 @@
 #include <commands/command_shutdown.h>
 #include <commands/command_useradd.h>
 #include <commands/command_whoami.h>
+#include <commands/command_sysinfo.h>
+#include <commands/command_ls.h>
+#include <commands/command_mkdir.h>
+#include <commands/command_cd.h>
+#include <commands/command_format.h>
+#include <commands/command_cat.h>
+#include <commands/command_touch.h>
+#include <commands/command_rm.h>
 
 typedef void (*CommandFunc)(const char* args);
 typedef struct {

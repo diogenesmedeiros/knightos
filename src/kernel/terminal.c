@@ -63,3 +63,71 @@ void terminal_print(const char* str) {
         terminal_putc(str[i]);
     }
 }
+
+void terminal_write_dec(uint64_t value) {
+    char buffer[21];
+    int i = 0;
+
+    if (value == 0) {
+        terminal_putc('0');
+        return;
+    }
+
+    while (value > 0 && i < 20) {
+        buffer[i++] = '0' + (value % 10);
+        value /= 10;
+    }
+
+    while (--i >= 0) {
+        terminal_putc(buffer[i]);
+    }
+}
+
+void terminal_write_hex(uint32_t value) {
+    terminal_print("0x");
+
+    for (int i = 7; i >= 0; i--) {
+        uint8_t nibble = (value >> (i * 4)) & 0xF;
+        if (nibble < 10)
+            terminal_putc('0' + nibble);
+        else
+            terminal_putc('A' + (nibble - 10));
+    }
+}
+
+void terminal_write_size(uint64_t bytes) {
+    const char* unit;
+    uint32_t int_part = 0;
+    uint32_t decimal_part = 0;
+
+    if (bytes >= (1ULL << 40)) {
+        unit = "TB";
+        uint64_t tb = 1ULL << 40;
+        int_part = (uint32_t)(bytes >> 40);
+        decimal_part = (uint32_t)(((bytes & (tb - 1)) * 100) >> 40);
+    } else if (bytes >= (1ULL << 30)) {
+        unit = "GB";
+        uint64_t gb = 1ULL << 30;
+        int_part = (uint32_t)(bytes >> 30);
+        decimal_part = (uint32_t)(((bytes & (gb - 1)) * 100) >> 30);
+    } else {
+        unit = "MB";
+        uint64_t mb = 1ULL << 20;
+        int_part = (uint32_t)(bytes >> 20);
+        decimal_part = (uint32_t)(((bytes & (mb - 1)) * 100) >> 20);
+    }
+
+    terminal_write_dec(int_part);
+    terminal_putc('.');
+    if (decimal_part < 10)
+        terminal_putc('0');
+    terminal_write_dec(decimal_part);
+    terminal_print(" ");
+    terminal_print(unit);
+}
+
+void terminal_backspace() {
+    terminal_putc('\b');
+    terminal_putc(' ');
+    terminal_putc('\b');
+}

@@ -1,0 +1,1 @@
+void cmd_touch(const char* name);

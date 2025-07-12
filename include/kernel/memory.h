@@ -1,20 +1,29 @@
-
 #ifndef MEMORY_H
 #define MEMORY_H
 
-#define PAGE_SIZE 4096
-#define MAX_PAGES 32768
-#define BITMAP_SET(b, i)   ((b)[(i) / 8] |=  (1 << ((i) % 8)))
-#define BITMAP_CLEAR(b, i) ((b)[(i) / 8] &= ~(1 << ((i) % 8)))
-#define BITMAP_TEST(b, i)  ((b)[(i) / 8] &   (1 << ((i) % 8)))
-
 #include <stdint.h>
 
-void init_physical_memory();
-void* pmm_alloc();
-void pmm_free(void* addr);
-void memory_init();
-uint64_t get_total_memory_bytes();
-uint32_t pmm_count_free_pages();
+typedef struct {
+    uint32_t size;
+    uint64_t addr;
+    uint64_t len;
+    uint32_t type;
+} __attribute__((packed)) memory_map_t;
+
+typedef struct {
+    uint32_t flags;
+    uint32_t mem_lower;
+    uint32_t mem_upper;
+    uint32_t boot_device;
+    uint32_t cmdline;
+    uint32_t mods_count;
+    uint32_t mods_addr;
+    uint32_t syms[4];
+    uint32_t mmap_length;
+    uint32_t mmap_addr;
+} __attribute__((packed)) multiboot_info_t;
+
+uint64_t detect_memory(uint32_t magic, uint32_t addr);
+void terminal_write_dec(uint64_t value);
 
 #endif

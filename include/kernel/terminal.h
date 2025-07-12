@@ -7,5 +7,8 @@
 void terminal_init();
 void terminal_putc(char c);
 void terminal_print(const char* str);
+void terminal_write_dec(uint64_t value);
+void terminal_write_hex(uint32_t value);
+void terminal_write_size(uint64_t bytes);
 
 #endif

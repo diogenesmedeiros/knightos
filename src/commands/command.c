@@ -35,7 +35,7 @@ void command_execute(const char* input) {
     }
 
     if (input != NULL && input[0] != '\0') {
-        terminal_print("Comando nao reconhecido.\n");
+        terminal_print("Command not recognized.\n");
     }
 }
 
@@ -49,12 +49,21 @@ void command_list() {
 }
 
 void register_default_commands() {
-    command_register("help", cmd_help, "Mostra os comandos disponiveis");
-    command_register("echo", cmd_echo, "Imprime uma mensagem");
-    command_register("clear", cmd_clear, "Limpa a tela");
-    command_register("shutdown", cmd_shutdown, "Desliga o sistema");
-    command_register("reboot", cmd_reboot, "Reinicia o sistema");
-    command_register("useradd", cmd_useradd, "Cria um novo usuario");
-    command_register("login", cmd_login, "Faz login como usuario existente");
-    command_register("whoami", cmd_whoami, "Exibe o usuario atual");
+    command_register("help", cmd_help, "Shows available commands");
+    command_register("echo", cmd_echo, "Print a message");
+    command_register("clear", cmd_clear, "Clean the screen");
+    command_register("shutdown", cmd_shutdown, "Turn off the system");
+    command_register("reboot", cmd_reboot, "Restart the system");
+    command_register("useradd", cmd_useradd, "Create a new user");
+    command_register("login", cmd_login, "Logs in as an existing user");
+    command_register("whoami", cmd_whoami, "Displays the current user");
+    command_register("sysinfo", cmd_sysinfo, "Displays system information");
+    command_register("mkdir", cmd_mkdir, "Creates a new folder");
+    command_register("ls", cmd_ls, "Lists folders and files in the current directory");
+    command_register("cd", cmd_cd, "Navigates into a folder");
+    command_register("format", cmd_format, "Formats the disk");
+    command_register("cat", cmd_cat, "Displays the contents of a file on the screen");
+    //command_register("edit", cmd_edit, "Opens a simple interactive terminal editor to input content");
+    command_register("touch", cmd_touch, "Creates a new empty file in the current directory");
+    command_register("rm", cmd_rm, "Remove files and directories from the system");
 }

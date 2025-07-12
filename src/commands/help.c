@@ -2,6 +2,6 @@
 
 void cmd_help(const char* _) {
     (void)_;
-    terminal_print("Comandos disponiveis:\n");
+    terminal_print("Available commands:\n");
     command_list();
 }

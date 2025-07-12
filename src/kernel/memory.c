@@ -1,56 +1,23 @@
 #include <kernel/memory.h>
 
-static uint8_t bitmap[MAX_PAGES / 8];
-static uint32_t total_pages = 0;
-static uint32_t next_free_page = 0;
+uint64_t detect_memory(uint32_t magic, uint32_t addr) {
+    if (magic != 0x2BADB002)
+        return 0;
 
+    multiboot_info_t* mbi = (multiboot_info_t*) addr;
 
-void init_physical_memory(uint32_t mem_size) {
-    total_pages = mem_size / PAGE_SIZE;
-    for (uint32_t i = 0; i < total_pages / 8; i++) {
-        bitmap[i] = 0x00;
-    }
+    if (!(mbi->flags & (1 << 6)))
+        return 0;
 
-    // TODO: RESERVADO PARA O KERNEL
-    for (uint32_t i = 0; i < 256; i++) {
-        BITMAP_SET(bitmap, i);
-    }
+    uint64_t total_memory = 0;
+    memory_map_t* mmap = (memory_map_t*) mbi->mmap_addr;
 
-    next_free_page = 256;
-}
-
-void* pmm_alloc() {
-    for (uint32_t i = 0; i < total_pages; i++) {
-        if (!BITMAP_TEST(bitmap, i)) {
-            BITMAP_SET(bitmap, i);
-            return (void*)(i * PAGE_SIZE);
+    while ((uint32_t)mmap < mbi->mmap_addr + mbi->mmap_length) {
+        if (mmap->type == 1) {
+            total_memory += (uint64_t)mmap->len;
         }
+        mmap = (memory_map_t*)((uint32_t)mmap + mmap->size + 4);
     }
 
-    for (uint32_t i = 0; i < next_free_page; i++) {
-        if (!BITMAP_TEST(bitmap, i)) {
-            BITMAP_SET(bitmap, i);
-            next_free_page = i + 1;
-            return (void*)(i * PAGE_SIZE);
-        }
-    }
-
-    return 0;
-}
-
-void pmm_free(void* addr) {
-    uint32_t i = (uint32_t)addr / PAGE_SIZE;
-    if (i >= total_pages) return;
-    BITMAP_CLEAR(bitmap, i);
-    if (i < next_free_page) {
-        next_free_page = i;
-    }
-}
-
-uint32_t pmm_count_free_pages() {
-    uint32_t count = 0;
-    for (uint32_t i = 0; i < total_pages; i++) {
-        if (!BITMAP_TEST(bitmap, i)) count++;
-    }
-    return count;
+    return total_memory;
 }

@@ -1,0 +1,20 @@
+{
+    "files.associations": {
+        "*.dbclient-js": "javascript",
+        "memory.h": "c",
+        "kernel.h": "c",
+        "shell.h": "c",
+        "user.h": "c",
+        "string.h": "c",
+        "cpu.h": "c",
+        "terminal.h": "c",
+        "command_sysinfo.h": "c",
+        "pci.h": "c",
+        "disk.h": "c",
+        "fs.h": "c",
+        "command_edit.h": "c",
+        "command.h": "c",
+        "keyboard.h": "c",
+        "stddef.h": "c"
+    }
+}

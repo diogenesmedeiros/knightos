@@ -1,0 +1,1 @@
+void cmd_cat(const char* name);

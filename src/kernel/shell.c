@@ -3,17 +3,22 @@
 static char input_buffer[MAX_INPUT];
 static int input_pos = 0;
 
-void shell_prompt() {
-    const char* userLogged = user_whoami();
 
-    if (strcmp(userLogged, "none") == 0) {
-        terminal_print("[knightos]$ ");
+void shell_prompt() {
+    const char* user = user_whoami();
+    const char* dir = fs_get_current_directory();
+
+    terminal_print("[");
+    
+    if (strcmp(user, "none") != 0) {
+        terminal_print(user);
     } else {
-        terminal_print("[");
-        terminal_print(userLogged);
-        terminal_print("]");
-        terminal_print("$ ");
+        terminal_print("guest");
     }
+
+    terminal_print("@knightos:");
+    terminal_print(dir);
+    terminal_print("]$ ");
 }
 
 void shell_execute(const char* cmd) {

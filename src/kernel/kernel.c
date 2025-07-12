@@ -11,10 +11,17 @@ const struct multiboot_header_t multiboot_header = {
 
 extern void register_default_commands();
 
-void kernel_main(void) {
+uint64_t g_total_ram = 0;
+
+void kernel_main(uint32_t magic, uint32_t multiboot_info_addr) {
+    g_total_ram = detect_memory(magic, multiboot_info_addr);
+    
     user_init();
     register_default_commands();
     terminal_init();
+    terminal_print("KnightOS 0.1a\nCopyright (c) Soft Knight. All rights reserved.");
+    terminal_print("\n\n\n");
+    
     shell_prompt();
 
     while (1) {

@@ -24,7 +24,12 @@ Para limpar versões antigas:
 make clean
 ```
 
-O sistema compila os arquivos fonte, linka o kernel, gera a imagem ISO e executa o SO no emulador.
+> ⚠️ **Importante:**  
+> É necessário criar um arquivo de disco chamado disk.img, que será usado para armazenar arquivos, diretórios e setores do sistema de arquivos.
+> Você pode criá-lo com o seguinte comando:
+> ```bash
+> qemu-img create -f raw disk.img <SIZE_DISK>
+> ```
 
 # Contribuições
 Contribuições são muito bem-vindas! Se você deseja ajudar a melhorar o KnightOS, siga estas etapas:

@@ -17,11 +17,23 @@ COMMANDS_SOURCES = \
 	$(SRC)/commands/reboot.c \
 	$(SRC)/commands/shutdown.c \
 	$(SRC)/commands/useradd.c \
-	$(SRC)/commands/whoami.c
+	$(SRC)/commands/whoami.c \
+	$(SRC)/commands/sysinfo.c \
+	$(SRC)/commands/mkdir.c \
+	$(SRC)/commands/ls.c \
+	$(SRC)/commands/cd.c \
+	$(SRC)/commands/format.c \
+	$(SRC)/commands/touch.c \
+	$(SRC)/commands/cat.c \
+	$(SRC)/commands/rm.c
 
-LIBS_SOURCES = $(SRC)/lib/string.c
 
-DRIVERS_SOURCES = $(SRC)/drivers/keyboard.c
+LIBS_SOURCES = \
+	$(SRC)/lib/string.c \
+	$(SRC)/lib/time.c
+
+DRIVERS_SOURCES = \
+	$(SRC)/drivers/keyboard.c
 
 KERNEL_SOURCES = \
 	$(SRC)/kernel/kernel.c \
@@ -30,7 +42,8 @@ KERNEL_SOURCES = \
 	$(SRC)/kernel/shell.c \
 	$(SRC)/kernel/terminal.c \
 	$(SRC)/kernel/cpu.c \
-
+	$(SRC)/kernel/disk.c \
+	$(SRC)/kernel/fs.c
 
 KERNEL_BUILD = \
 	$(KERNEL_SOURCES) \
@@ -38,7 +51,10 @@ KERNEL_BUILD = \
 	$(LIBS_SOURCES) \
 	$(DRIVERS_SOURCES)
 
-KERNEL_OBJECTS = $(patsubst $(SRC)/%.c, $(BUILD)/%.o, $(KERNEL_BUILD))
+ASM_SOURCES = $(SRC)/kernel/start.asm
+ASM_OBJECTS = $(patsubst $(SRC)/%.asm, $(BUILD)/%.o, $(ASM_SOURCES))
+
+KERNEL_OBJECTS = $(patsubst $(SRC)/%.c, $(BUILD)/%.o, $(KERNEL_BUILD)) $(ASM_OBJECTS)
 
 KERNEL_BIN=$(BUILD)/kernel.bin
 
@@ -51,6 +67,10 @@ $(BUILD)/%.o: $(SRC)/%.c | $(BUILD)
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD)/%.o: $(SRC)/%.asm | $(BUILD)
+	mkdir -p $(dir $@)
+	nasm -f elf32 $< -o $@
+
 $(KERNEL_BIN): $(KERNEL_OBJECTS) linker.ld
 	$(LD) $(LDFLAGS) $(KERNEL_OBJECTS) -o $@
 
@@ -61,7 +81,8 @@ $(ISO_NAME): $(KERNEL_BIN) boot/grub/grub.cfg
 	grub-mkrescue -o $(ISO_NAME) isodir
 
 run: $(ISO_NAME)
-	qemu-system-i386 -netdev user,id=n1 -device e1000,netdev=n1 -hda $(ISO_NAME)
+	qemu-system-i386 -enable-kvm -cpu host -bios /usr/share/qemu/bios.bin \
+		-m 2048 -netdev user,id=n1 -device e1000,netdev=n1 -hda disk.img -cdrom $(ISO_NAME)
 
 clean:
 	rm -rf isodir $(BUILD) $(ISO_NAME)

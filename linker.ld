@@ -1,31 +1,26 @@
-ENTRY(kernel_main)
+ENTRY(_start)
 
 SECTIONS {
-    . = 0x10000;
+    . = 0x100000;
 
     .multiboot : {
         KEEP(*(.multiboot))
     }
 
     .text : {
-        *(.multiboot)
         *(.text)
     }
 
-    .rodata :
-    {
-        *(.rodata)
+    .rodata : {
+        *(.rodata*)
     }
 
     .data : {
         *(.data)
-        KEEP(*(.rodata*))
-        _binary_disk_img_start = .;
-        *(.diskimg)
+        *(COMMON)
     }
 
     .bss : {
         *(.bss)
-        *(COMMON)
     }
 }
