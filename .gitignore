@@ -1,3 +1,4 @@
-/build
-/isodir
-/knightos.iso
+build
+isodir
+knightos.iso
+disk.img
