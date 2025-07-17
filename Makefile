@@ -101,7 +101,7 @@ $(ISO_NAME): $(KERNEL_BIN) boot/grub/grub.cfg
 	grub-mkrescue -o $(ISO_NAME) isodir
 
 run: $(ISO_NAME)
-	qemu-system-i386 -enable-kvm -cpu host -bios /usr/share/qemu/bios.bin \
+	qemu-system-i386 -enable-kvm -cpu host -bios \
 		-m 2048 -netdev user,id=n1 -device e1000,netdev=n1 -hda disk.img -cdrom $(ISO_NAME)
 
 clean:

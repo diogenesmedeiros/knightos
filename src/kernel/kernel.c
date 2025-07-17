@@ -19,7 +19,7 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_addr) {
     user_init();
     register_default_commands();
     terminal_init();
-    terminal_print("KnightOS 0.1a\nCopyright (c) Soft Knight. All rights reserved.");
+    terminal_print("KnightOS 0.2a\nCopyright (c) Soft Knight. All rights reserved.");
     terminal_print("\n\n\n");
     
     shell_prompt();
