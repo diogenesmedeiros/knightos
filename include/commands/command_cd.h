@@ -3,7 +3,7 @@
 
 #include <commands/command.h>
 #include <kernel/terminal.h>
-#include <kernel/fs.h>
+#include <fs/fs.h>
 
 void cmd_cd(const char* arg);
 

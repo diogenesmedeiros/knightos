@@ -12,5 +12,6 @@
 void shell_prompt();
 void shell_execute(const char* cmd);
 void shell_handle_char(char c);
+void shell_run();
 
 #endif

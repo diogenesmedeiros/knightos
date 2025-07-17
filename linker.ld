@@ -1,11 +1,11 @@
 ENTRY(_start)
 
 SECTIONS {
-    . = 0x100000;
-
     .multiboot : {
         KEEP(*(.multiboot))
     }
+
+    . = 0x100000;
 
     .text : {
         *(.text)

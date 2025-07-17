@@ -1,0 +1,1 @@
+void cmd_sudo(const char* args);

@@ -15,6 +15,12 @@
         "command_edit.h": "c",
         "command.h": "c",
         "keyboard.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "stdlib.h": "c",
+        "command_cd.h": "c",
+        "command_format.h": "c",
+        "command_touch.h": "c",
+        "command_run_knt.h": "c",
+        "command_useradd.h": "c"
     }
 }

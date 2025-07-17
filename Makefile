@@ -25,15 +25,29 @@ COMMANDS_SOURCES = \
 	$(SRC)/commands/format.c \
 	$(SRC)/commands/touch.c \
 	$(SRC)/commands/cat.c \
-	$(SRC)/commands/rm.c
+	$(SRC)/commands/rm.c \
+	$(SRC)/commands/run_knt.c \
+	$(SRC)/commands/edit.c \
+	$(SRC)/commands/sudo.c
 
 
 LIBS_SOURCES = \
 	$(SRC)/lib/string.c \
-	$(SRC)/lib/time.c
+	$(SRC)/lib/time.c \
+	$(SRC)/lib/sha256.c \
+	$(SRC)/lib/utils.c \
+	$(SRC)/lib/stdlib.c \
+	$(SRC)/lib/libc_compat.c
+	
+LANG_SOURCES = \
+	$(SRC)/knt/interpreter.c \
+	$(SRC)/knt/knightlang.c \
+	$(SRC)/knt/lexer.c \
+	$(SRC)/knt/parser.c
 
 DRIVERS_SOURCES = \
-	$(SRC)/drivers/keyboard.c
+	$(SRC)/drivers/keyboard.c \
+	$(SRC)/drivers/mouse.c
 
 KERNEL_SOURCES = \
 	$(SRC)/kernel/kernel.c \
@@ -43,13 +57,19 @@ KERNEL_SOURCES = \
 	$(SRC)/kernel/terminal.c \
 	$(SRC)/kernel/cpu.c \
 	$(SRC)/kernel/disk.c \
-	$(SRC)/kernel/fs.c
+	$(SRC)/kernel/editor.c
+
+FS_SOURCES = \
+	$(SRC)/fs/fs.c \
+	$(SRC)/fs/file.c
 
 KERNEL_BUILD = \
 	$(KERNEL_SOURCES) \
 	$(COMMANDS_SOURCES) \
 	$(LIBS_SOURCES) \
-	$(DRIVERS_SOURCES)
+	$(DRIVERS_SOURCES) \
+	$(LANG_SOURCES) \
+	$(FS_SOURCES)
 
 ASM_SOURCES = $(SRC)/kernel/start.asm
 ASM_OBJECTS = $(patsubst $(SRC)/%.asm, $(BUILD)/%.o, $(ASM_SOURCES))

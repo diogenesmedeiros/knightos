@@ -1,4 +1,5 @@
 #include <kernel/shell.h>
+#include <drivers/keyboard.h>
 
 static char input_buffer[MAX_INPUT];
 static int input_pos = 0;
@@ -48,5 +49,16 @@ void shell_handle_char(char c) {
     if (input_pos < MAX_INPUT - 1) {
         input_buffer[input_pos++] = c;
         terminal_putc(c);
+    }
+}
+
+void shell_run() {
+    shell_prompt();
+    while (1) {
+        keyboard_poll();
+        if (!keyboard_has_char()) continue;
+
+        char c = keyboard_get_char();
+        shell_handle_char(c);
     }
 }

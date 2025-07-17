@@ -1,0 +1,1 @@
+void cmd_run_knt(const char* args);

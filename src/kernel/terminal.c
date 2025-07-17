@@ -11,13 +11,40 @@ static uint16_t vga_entry(char c, uint8_t color) {
     return (uint16_t) c | ((uint16_t) color << 8);
 }
 
-static void update_cursor(int row, int col) {
+void update_cursor(int row, int col) {
     uint16_t position = row * VGA_WIDTH + col;
 
     outb(0x3D4, 0x0F);
     outb(0x3D5, (uint8_t)(position & 0xFF));
     outb(0x3D4, 0x0E);
     outb(0x3D5, (uint8_t)((position >> 8) & 0xFF));
+}
+
+char terminal_getchar() {
+    return keyboard_get_char();
+}
+
+void terminal_read_password(char* buf, int max_len) {
+    int i = 0;
+    while (i < max_len - 1) {
+        keyboard_poll(); // <-- precisa estar aqui para capturar as teclas!
+
+        if (!keyboard_has_char()) continue;
+
+        char c = terminal_getchar();
+        if (c == '\n' || c == '\r') break;
+        if (c == '\b' && i > 0) {
+            i--;
+            terminal_putc('\b');
+            terminal_putc(' ');
+            terminal_putc('\b');
+            continue;
+        }
+        buf[i++] = c;
+        terminal_putc('*');
+    }
+    buf[i] = '\0';
+    terminal_print("\n");
 }
 
 void terminal_clear() {
@@ -130,4 +157,10 @@ void terminal_backspace() {
     terminal_putc('\b');
     terminal_putc(' ');
     terminal_putc('\b');
+}
+
+void terminal_print_int(int value) {
+    char buffer[32];
+    itoa(value, buffer, 10);
+    terminal_print(buffer);
 }

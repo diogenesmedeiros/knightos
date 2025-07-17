@@ -4,6 +4,11 @@
 #include <lib/string.h>
 
 void cmd_format(const char* _) {
+    if (!user_is_root()) {
+        terminal_print("Permissão negada: requer root.\n");
+        return;
+    }
+
     terminal_print("Formatting disk...\n");
 
     uint8_t empty[512] = {0};

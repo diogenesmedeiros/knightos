@@ -15,5 +15,6 @@ void keyboard_poll();
 void keyboard_put_char(char c);
 char keyboard_get_char();
 char keyboard_read_char_blocking();
+int keyboard_has_char();
 
 #endif

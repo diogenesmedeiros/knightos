@@ -1,5 +1,5 @@
 #include <commands/command_rm.h>
-#include <kernel/fs.h>
+#include <fs/fs.h>
 #include <kernel/terminal.h>
 #include <kernel/disk.h>
 #include <lib/string.h>

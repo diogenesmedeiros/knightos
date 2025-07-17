@@ -1,12 +1,37 @@
 #include <commands/command_touch.h>
 #include <kernel/terminal.h>
 #include <kernel/disk.h>
-#include <kernel/fs.h>
+#include <fs/fs.h>
 #include <lib/string.h>
+#include <lib/utils.h>
 
-void cmd_touch(const char* name) {
-    if (!name || strlen(name) == 0 || strlen(name) > 15) {
-        terminal_print("Usage: touch <file.txt>\n");
+void cmd_touch(const char* args) {
+    if (!args || strlen(args) == 0) {
+        terminal_print("Usage: touch <file.txt> [> content]\n");
+        return;
+    }
+
+    char name[16] = {0};
+    char content[497] = {0};
+
+    const char* redirect = strchr(args, '>');
+    if (redirect) {
+        size_t name_len = redirect - args;
+        if (name_len >= sizeof(name)) name_len = sizeof(name) - 1;
+        strncpy(name, args, name_len);
+        trim(name);
+
+        redirect++;
+        while (*redirect == ' ') redirect++;
+        strncpy(content, redirect, sizeof(content) - 1);
+        trim(content);
+    } else {
+        strncpy(name, args, sizeof(name) - 1);
+        trim(name);
+    }
+
+    if (strlen(name) == 0 || strlen(name) > 15) {
+        terminal_print("Usage: touch <file.txt> [> content]\n");
         return;
     }
 
@@ -61,5 +86,8 @@ void cmd_touch(const char* name) {
     ata_write_sector(parent_sector, sector);
 
     memset(buf, 0, 512);
+    if (strlen(content) > 0) {
+        strncpy((char*)buf, content, 512);
+    }
     ata_write_sector(data_sector, buf);
 }

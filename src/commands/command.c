@@ -66,4 +66,7 @@ void register_default_commands() {
     //command_register("edit", cmd_edit, "Opens a simple interactive terminal editor to input content");
     command_register("touch", cmd_touch, "Creates a new empty file in the current directory");
     command_register("rm", cmd_rm, "Remove files and directories from the system");
+    command_register("knt", cmd_run_knt, "--------");
+    command_register("edit", cmd_edit, "--------");
+    command_register("sudo", cmd_sudo, "--------");
 }

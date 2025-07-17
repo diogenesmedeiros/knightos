@@ -24,6 +24,9 @@
 #include <commands/command_cat.h>
 #include <commands/command_touch.h>
 #include <commands/command_rm.h>
+#include <commands/command_run_knt.h>
+#include <commands/command_edit.h>
+#include <commands/command_sudo.h>
 
 typedef void (*CommandFunc)(const char* args);
 typedef struct {

@@ -25,6 +25,6 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_addr) {
     shell_prompt();
 
     while (1) {
-        keyboard_poll();
+        shell_run();
     }
 }

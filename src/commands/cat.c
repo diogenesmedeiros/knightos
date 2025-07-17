@@ -1,12 +1,12 @@
 #include <commands/command_cat.h>
-#include <kernel/fs.h>
+#include <fs/fs.h>
 #include <kernel/terminal.h>
 #include <kernel/disk.h>
 #include <lib/string.h>
 #include <commands/command_clear.h>
 
 void cmd_cat(const char* name) {
-    cmd_clear(NULL);
+    terminal_print('\n');
     uint8_t sector[512];
     ata_read_sector(fs_get_current_sector(), sector);
 
