@@ -37,36 +37,9 @@ qemu-img create -f raw disk.img 64M
 ```
 Você pode ajustar o tamanho conforme sua necessidade (64M, 128M, etc.).
 
-# Contribuições
-Contribuições são muito bem-vindas! Se você deseja ajudar a melhorar o KnightOS, siga estas etapas:
-
-1. Faça um **fork** deste repositório.
-2. Crie uma **branch** para sua feature ou correção de bug:
-```bash
-git checkout -b minha-feature
-```
-3. Faça suas modificações e commit:
-```bash
-git commit -m "Descrição clara do que foi alterado"
-```
-4. Envie suas alterações para seu fork:
-```bash
-git push origin minha-feature
-```
-5. Abra um **Pull Request** para este repositório principal descrevendo as mudanças e o motivo delas.
-
-# Regras para contribuições
-- Mantenha o código legível e comentado.
-- Teste seu código antes de enviar.
-- Siga o estilo e estrutura do projeto.
-- Verifique se já existe uma issue ou PR relacionado à sua alteração.
-
 # Objetivo Didático
 Este projeto é **educacional**, com foco em:
 - Entendimento de como um kernel gerencia hardware e software.
 - Implementação de comandos de terminal.
 - Gerenciamento de memória, sistema de arquivos e processos.
 - Escrita em setores diretos no disco via interface ATA.
-
-# Participe!
-Sinta-se livre para dar sugestões, reportar bugs ou propor novas funcionalidades. Todos podem colaborar para tornar o KnightOS um ambiente de aprendizado cada vez mais completo.
