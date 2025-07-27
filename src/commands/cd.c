@@ -1,4 +1,6 @@
-#include <commands/command_cd.h>
+#include <commands/command.h>
+#include <kernel/terminal.h>
+#include <fs/fs.h>
 
 void cmd_cd(const char* arg) {
     if (arg == 0 || *arg == '\0') {
@@ -7,7 +9,5 @@ void cmd_cd(const char* arg) {
     }
 
     fs_set_current_directory(arg);
-
-    terminal_print(fs_get_current_directory());
     terminal_print("\n");
 }

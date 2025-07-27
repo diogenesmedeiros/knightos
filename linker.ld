@@ -1,14 +1,17 @@
 ENTRY(_start)
 
 SECTIONS {
-    .multiboot : {
+    . = 0x100000;
+
+    kernel_start = .;
+
+    .multiboot ALIGN(4K) : {
         KEEP(*(.multiboot))
     }
 
-    . = 0x100000;
-
-    .text : {
-        *(.text)
+    .text ALIGN(4K) : {
+        *(.text.startup)
+        *(.text*)
     }
 
     .rodata : {
@@ -23,4 +26,6 @@ SECTIONS {
     .bss : {
         *(.bss)
     }
+
+    kernel_end = .;
 }

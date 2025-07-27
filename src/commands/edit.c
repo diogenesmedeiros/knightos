@@ -1,12 +1,11 @@
 #include <kernel/terminal.h>
-#include <kernel/editor.h>
-#include <commands/command_edit.h>
+#include <programs/editor.h>
 
 void cmd_edit(const char* args) {
     while (*args == ' ') args++;
 
     if (*args == '\0') {
-        terminal_print("Uso: edit <nome_do_arquivo>\n");
+        terminal_print("Usage: edit <filename>\n");
         return;
     }
 

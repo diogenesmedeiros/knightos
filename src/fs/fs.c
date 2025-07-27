@@ -1,19 +1,27 @@
 #include <fs/fs.h>
 #include <kernel/terminal.h>
-#include <kernel/disk.h>
+#include <fs/disk.h>
 #include <lib/string.h>
 
 static char current_directory[256] = "/";
 static uint8_t current_sector = 1;
 
+// Retorna o diretório atual do sistema de arquivos (ponteiro para current_directory)
 const char* fs_get_current_directory() {
     return current_directory;
 }
 
+// Retorna o setor atual do sistema de arquivos (variável current_sector)
 uint8_t fs_get_current_sector() {
     return current_sector;
 }
 
+/**
+ * Altera o diretório atual do sistema de arquivos
+ * Se o caminho for "..", sobe um nível na hierarquia (remove o último diretório do path)
+ * Caso contrário, procura o subdiretório no setor atual e atualiza current_directory e 
+ * current_sector
+ */
 void fs_set_current_directory(const char* path) {
     if (strcmp(path, "..") == 0) {
         int len = strlen(current_directory);
@@ -56,6 +64,11 @@ void fs_set_current_directory(const char* path) {
     terminal_print("Directory not found.\n");
 }
 
+/** 
+ * Procura um arquivo no diretório atual pelo nome
+ * Lê o setor atual, percorre as entradas do tipo arquivo (0x02),
+ * compara os nomes e retorna o setor correspondente se encontrado
+ */
 int fs_find(const char* name) {
     uint8_t sector[512];
     uint8_t dir_sector = fs_get_current_sector();

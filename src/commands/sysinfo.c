@@ -1,4 +1,7 @@
-#include <commands/command_sysinfo.h>
+#include <kernel/kernel.h>
+#include <kernel/terminal.h>
+#include <kernel/cpu.h>
+#include <fs/disk.h>
 
 void cmd_sysinfo(const char* _) {
     

@@ -8,12 +8,6 @@
 #define MAX_PASSWORD_LEN 64
 #define USER_SECTOR 50
 
-typedef struct {
-    char name[MAX_USERNAME_LEN];
-    char password_hash[MAX_PASSWORD_LEN];
-    int is_root;
-} User;
-
 void user_init();
 int user_add(const char* name, const char* password);
 int user_login(const char* name, const char* password);

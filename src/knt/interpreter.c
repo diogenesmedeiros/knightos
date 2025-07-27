@@ -59,7 +59,7 @@ void run_statements(Statement* stmt) {
                 if (body) {
                     run_statements(body);
                 } else {
-                    terminal_print("Funcao nao encontrada: ");
+                    terminal_print("Function not found: ");
                     terminal_print(cursor->name);
                     terminal_print("\n");
                 }

@@ -1,6 +1,6 @@
-#include <commands/command_touch.h>
 #include <kernel/terminal.h>
-#include <kernel/disk.h>
+#include <kernel/memory.h>  // necessário para alloc_page()
+#include <fs/disk.h>
 #include <fs/fs.h>
 #include <lib/string.h>
 #include <lib/utils.h>
@@ -35,7 +35,18 @@ void cmd_touch(const char* args) {
         return;
     }
 
-    uint8_t sector[512];
+    uint8_t* sector = (uint8_t*)alloc_page();
+    if (!sector) {
+        terminal_print("Failed to allocate memory for directory.\n");
+        return;
+    }
+
+    uint8_t* buf = (uint8_t*)alloc_page();
+    if (!buf) {
+        terminal_print("Failed to allocate memory for data.\n");
+        return;
+    }
+
     uint8_t parent_sector = fs_get_current_sector();
     ata_read_sector(parent_sector, sector);
 
@@ -54,7 +65,6 @@ void cmd_touch(const char* args) {
     }
 
     int data_sector = -1;
-    uint8_t buf[512];
     for (int s = 2; s < 255; s++) {
         ata_read_sector(s, buf);
         int vazio = 1;
@@ -90,4 +100,7 @@ void cmd_touch(const char* args) {
         strncpy((char*)buf, content, 512);
     }
     ata_write_sector(data_sector, buf);
+
+    free_page((uint32_t)sector);
+    free_page((uint32_t)buf);
 }

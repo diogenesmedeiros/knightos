@@ -1,11 +1,19 @@
-#include <kernel/cpu.h>
+#include <stdint.h>
 
+/**
+ * Executa a instrução CPUID com código em 'code'
+ * Retorna os registradores EAX, EBX, ECX e EDX via ponteiros 'a', 'b', 'c' e 'd'
+ */
 void cpuid(uint32_t code, uint32_t* a, uint32_t* b, uint32_t* c, uint32_t* d) {
     __asm__ volatile ("cpuid"
                       : "=a"(*a), "=b"(*b), "=c"(*c), "=d"(*d)
                       : "a"(code));
 }
 
+/**
+ * Obtém a string do modelo da CPU usando CPUID (0x80000002 a 0x80000004)
+ * Armazena os 48 bytes da identificação no buffer e adiciona terminador nulo
+ */
 void get_cpu_brand(char* buffer) {
     uint32_t a, b, c, d;
 

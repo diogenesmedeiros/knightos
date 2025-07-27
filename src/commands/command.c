@@ -1,3 +1,27 @@
+#include <kernel/user.h>
+#include <kernel/terminal.h>
+#include <programs/shell.h>
+#include <commands/command_clear.h>
+#include <commands/command_echo.h>
+#include <commands/command_help.h>
+#include <commands/command_login.h>
+#include <commands/command_reboot.h>
+#include <commands/command_shutdown.h>
+#include <commands/command_useradd.h>
+#include <commands/command_whoami.h>
+#include <commands/command_sysinfo.h>
+#include <commands/command_ls.h>
+#include <commands/command_mkdir.h>
+#include <commands/command_cd.h>
+#include <commands/command_format.h>
+#include <commands/command_cat.h>
+#include <commands/command_touch.h>
+#include <commands/command_rm.h>
+#include <commands/command_run_knt.h>
+#include <commands/command_edit.h>
+#include <commands/command_sudo.h>
+#include <commands/command_allocpage.h>
+#include <commands/command_proc.h>
 #include <commands/command.h>
 
 static Command commands[MAX_COMMANDS];
@@ -63,10 +87,12 @@ void register_default_commands() {
     command_register("cd", cmd_cd, "Navigates into a folder");
     command_register("format", cmd_format, "Formats the disk");
     command_register("cat", cmd_cat, "Displays the contents of a file on the screen");
-    //command_register("edit", cmd_edit, "Opens a simple interactive terminal editor to input content");
     command_register("touch", cmd_touch, "Creates a new empty file in the current directory");
     command_register("rm", cmd_rm, "Remove files and directories from the system");
-    command_register("knt", cmd_run_knt, "--------");
-    command_register("edit", cmd_edit, "--------");
-    command_register("sudo", cmd_sudo, "--------");
+    command_register("knt", cmd_run_knt, "Executes .knt language scripts or commands");
+    command_register("edit", cmd_edit, "Opens a simple interactive terminal editor to input content");
+    command_register("sudo", cmd_sudo, "Executes commands with superuser privileges");
+    command_register("memtest", cmd_allocpage, "Allocates a page of memory");
+    command_register("proc_list", cmd_proc, "-----");
+    command_register("kill", cmd_kill_proc, "Kill a process by PID");
 }

@@ -1,7 +1,13 @@
-#include <kernel/user.h>
 #include <lib/sha256.h>
 #include <lib/string.h>
-#include <kernel/disk.h>
+#include <fs/disk.h>
+#include <kernel/user.h>
+
+typedef struct {
+    char name[MAX_USERNAME_LEN];
+    char password_hash[MAX_PASSWORD_LEN];
+    int is_root;
+} User;
 
 static User users[MAX_USERS];
 static int user_count = 0;
@@ -23,6 +29,18 @@ void user_init() {
     user_count = 0;
     current_user = 0;
     user_load_all();
+
+    int found_root = 0;
+    for (int i = 0; i < MAX_USERS; i++) {
+        if (strcmp(users[i].name, "root") == 0) {
+            found_root = 1;
+            break;
+        }
+    }
+
+    if (!found_root) {
+        user_add("root", "root");
+    }
 }
 
 int user_add(const char* name, const char* password) {
@@ -79,7 +97,7 @@ int user_check_password(const char* name, const char* password) {
     for (int i = 0; i < user_count; i++) {
         if (strcmp(users[i].name, name) == 0 &&
             strncmp(users[i].password_hash, hex, 64) == 0) {
-            return 1; // senha correta
+            return 1;
         }
     }
     return 0;

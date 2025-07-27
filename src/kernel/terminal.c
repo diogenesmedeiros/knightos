@@ -1,4 +1,7 @@
+#include <drivers/io.h>
+#include <stdint.h>
 #include <kernel/terminal.h>
+#include <drivers/keyboard.h>
 
 static uint16_t* const VGA_BUFFER = (uint16_t*)0xB8000;
 static const int VGA_WIDTH = 80;
@@ -27,7 +30,7 @@ char terminal_getchar() {
 void terminal_read_password(char* buf, int max_len) {
     int i = 0;
     while (i < max_len - 1) {
-        keyboard_poll(); // <-- precisa estar aqui para capturar as teclas!
+        keyboard_poll();
 
         if (!keyboard_has_char()) continue;
 
@@ -59,16 +62,32 @@ void terminal_clear() {
 
 void terminal_init() {
     terminal_clear();
+    terminal_row = 0;
+    terminal_col = 0;
+    update_cursor(0, 0);
 }
 
 void terminal_putc(char c) {
     if (c == '\n') {
         terminal_col = 0;
         terminal_row++;
+        if (terminal_row >= VGA_HEIGHT) {
+            for (int y = 1; y < VGA_HEIGHT; y++) {
+                for (int x = 0; x < VGA_WIDTH; x++) {
+                    VGA_BUFFER[(y - 1) * VGA_WIDTH + x] = VGA_BUFFER[y * VGA_WIDTH + x];
+                }
+            }
+            for (int x = 0; x < VGA_WIDTH; x++) {
+                VGA_BUFFER[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(' ', terminal_color);
+            }
+            terminal_row = VGA_HEIGHT - 1;
+        }
+        update_cursor(terminal_row, terminal_col);
         return;
     } else if (c == '\b') {
         if (terminal_col > 0) terminal_col--;
         VGA_BUFFER[terminal_row * VGA_WIDTH + terminal_col] = vga_entry(' ', terminal_color);
+        update_cursor(terminal_row, terminal_col);
         return;
     }
 
@@ -77,9 +96,17 @@ void terminal_putc(char c) {
     if (terminal_col >= VGA_WIDTH) {
         terminal_col = 0;
         terminal_row++;
-    }
-    if (terminal_row >= VGA_HEIGHT) {
-        terminal_row = 0;
+        if (terminal_row >= VGA_HEIGHT) {
+            for (int y = 1; y < VGA_HEIGHT; y++) {
+                for (int x = 0; x < VGA_WIDTH; x++) {
+                    VGA_BUFFER[(y - 1) * VGA_WIDTH + x] = VGA_BUFFER[y * VGA_WIDTH + x];
+                }
+            }
+            for (int x = 0; x < VGA_WIDTH; x++) {
+                VGA_BUFFER[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(' ', terminal_color);
+            }
+            terminal_row = VGA_HEIGHT - 1;
+        }
     }
 
     update_cursor(terminal_row, terminal_col);

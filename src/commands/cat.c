@@ -1,7 +1,6 @@
-#include <commands/command_cat.h>
 #include <fs/fs.h>
 #include <kernel/terminal.h>
-#include <kernel/disk.h>
+#include <fs/disk.h>
 #include <lib/string.h>
 #include <commands/command_clear.h>
 

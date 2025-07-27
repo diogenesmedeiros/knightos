@@ -21,13 +21,13 @@ void parse_script(const char* src) {
         if (t.type == TOKEN_EOF) break;
 
         if (t.type == TOKEN_FUNC) {
-            advance_token(); // consome 'func'
-            Token name = advance_token(); // nome da função
-            advance_token(); // consome (
-            advance_token(); // consome )
-            advance_token(); // consome {
+            advance_token(); // consumes 'func'
+            Token name = advance_token(); // function name
+            advance_token(); // consume (
+            advance_token(); // consume )
+            advance_token(); // consume {
             Statement* body = parse_block();
-            advance_token(); // consome }
+            advance_token(); // consume }
 
             Statement* s = malloc(sizeof(Statement));
             s->type = STMT_FUNC_DECL;
@@ -52,7 +52,7 @@ void parse_script(const char* src) {
                 add_statement(s);
             } else if (peek_token().type == TOKEN_LPAREN) {
                 advance_token(); // (
-                Token val = advance_token(); // argumento
+                Token val = advance_token(); // argument
                 advance_token(); // )
 
                 Statement* s = malloc(sizeof(Statement));
@@ -67,7 +67,7 @@ void parse_script(const char* src) {
                 add_statement(s);
             }
         } else {
-            advance_token(); // ignora token desconhecido
+            advance_token(); // ignore unknown token
         }
     }
 }
@@ -97,7 +97,7 @@ Statement* parse_block() {
                 else tail = tail->next = s;
             } else if (peek_token().type == TOKEN_LPAREN) {
                 advance_token(); // (
-                Token val = advance_token(); // valor dentro do print
+                Token val = advance_token(); // value inside the print
                 advance_token(); // )
 
                 Statement* s = malloc(sizeof(Statement));
@@ -114,7 +114,7 @@ Statement* parse_block() {
                 else tail = tail->next = s;
             }
         } else {
-            advance_token(); // ignorar
+            advance_token(); // ignore
         }
     }
 

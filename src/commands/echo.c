@@ -1,4 +1,4 @@
-#include <commands/command_echo.h>
+#include <kernel/terminal.h>
 
 void cmd_echo(const char* args) {
     while (*args == ' ') args++;

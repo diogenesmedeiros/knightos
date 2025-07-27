@@ -1,6 +1,6 @@
 #include <commands/command_useradd.h>
-#include <kernel/user.h>
 #include <kernel/terminal.h>
+#include <kernel/user.h>
 #include <lib/string.h>
 
 void cmd_useradd(const char* args) {

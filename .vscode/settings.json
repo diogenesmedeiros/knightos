@@ -21,6 +21,25 @@
         "command_format.h": "c",
         "command_touch.h": "c",
         "command_run_knt.h": "c",
-        "command_useradd.h": "c"
+        "command_useradd.h": "c",
+        "command_ls.h": "c",
+        "command_whoami.h": "c",
+        "command_reboot.h": "c",
+        "command_mkdir.h": "c",
+        "command_clear.h": "c",
+        "command_cat.h": "c",
+        "command_echo.h": "c",
+        "command_help.h": "c",
+        "command_login.h": "c",
+        "command_shutdown.h": "c",
+        "stdint.h": "c",
+        "file.h": "c",
+        "sha256.h": "c",
+        "utils.h": "c",
+        "process.h": "c",
+        "api.h": "c",
+        "ethernet.h": "c",
+        "etharp.h": "c",
+        "netif.h": "c"
     }
 }

@@ -14,7 +14,7 @@ void cmd_run_knt(const char* args) {
     filename[i] = '\0';
 
     if (filename[0] == '\0') {
-        terminal_print("Uso: run <arquivo.knt>\n");
+        terminal_print("Usage: run <file.knt>\n");
         return;
     }
 

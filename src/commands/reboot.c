@@ -1,4 +1,4 @@
-#include <commands/command_reboot.h>
+#include <drivers/io.h>
 
 void cmd_reboot(const char* _) {
     (void)_;

@@ -1,7 +1,7 @@
 #include <fs/file.h>
 #include <fs/fs.h>
 #include <kernel/terminal.h>
-#include <kernel/disk.h>
+#include <fs/disk.h>
 #include <lib/string.h>
 #include <lib/stdlib.h>
 #include <stdint.h>
@@ -71,7 +71,7 @@ static void editor_print_screen(const char* filename) {
 
     print_line_of_chars('-');
 
-    const char* footer = " Ctrl+X = sair | Enter = nova linha | Backspace = apagar ";
+    const char* footer = " Ctrl+X = exit | Enter = new line | Backspace = delete ";
     print_line_with_padding(footer);
 
     update_cursor(cursor_line + 2, cursor_col);
@@ -170,7 +170,7 @@ static void editor_move_cursor_right() {
 void editor_save(const char* filename) {
     int sector = fs_find(filename);
     if (sector < 0) {
-        terminal_print("Arquivo nao encontrado para salvar: ");
+        terminal_print("File not found to save: ");
         terminal_print(filename);
         terminal_print("\n");
         return;
@@ -189,7 +189,7 @@ void editor_save(const char* filename) {
     }
 
     ata_write_sector(sector, (uint8_t*)buffer);
-    terminal_print("Arquivo salvo.\n");
+    terminal_print("File saved.\n");
 }
 
 void editor_open(const char* filename) {
@@ -236,7 +236,7 @@ void editor_run(const char* filename) {
         if (c == 24) {
             terminal_clear();
             editor_save(filename);
-            terminal_print("Saindo do editor...\n");
+            terminal_print("Leaving the editor...\n");
             break;
         } else if (c == '\r' || c == '\n') {
             editor_new_line();

@@ -1,5 +1,13 @@
-#include <kernel/disk.h>
+#include <drivers/io.h>
 
+#define ATA_PRIMARY_IO  0x1F0
+#define ATA_PRIMARY_CTRL 0x3F6
+
+/**
+ * Lê 1 setor (512 bytes) de um disco ATA usando LBA e armazena no buffer
+ * Envia comandos à porta ATA primária (0x1F0–0x1F7) para configurar o LBA, iniciar a leitura (0x20),
+ * espera até o disco estar pronto (bit DRQ ativado), e então lê os 256 words (16 bits cada) da porta de dados.
+ */
 void ata_read_sector(uint32_t lba, uint8_t* buffer) {
     outb(0x1F6, 0xE0 | ((lba >> 24) & 0x0F));
     outb(0x1F2, 1);
@@ -15,6 +23,12 @@ void ata_read_sector(uint32_t lba, uint8_t* buffer) {
     }
 }
 
+/**
+ * Escreve 1 setor (512 bytes) no disco ATA usando LBA a partir do buffer
+ * Configura o endereço LBA nas portas ATA (0x1F3–0x1F6), espera o disco estar pronto,
+ * envia o comando de escrita (0x30), espera o bit DRQ, e escreve 256 words (16 bits) 
+ * na porta de dados (0x1F0).
+ */
 void ata_write_sector(uint32_t lba, const uint8_t* buffer) {
     outb(0x1F6, 0xE0 | ((lba >> 24) & 0x0F));
 
@@ -37,6 +51,11 @@ void ata_write_sector(uint32_t lba, const uint8_t* buffer) {
     while (inb(0x1F7) & 0x80);
 }
 
+/**
+ * Detecta o tamanho do disco ATA primário em bytes usando o comando IDENTIFY (0xEC)
+ * Lê os 512 bytes de resposta, extrai os setores totais dos campos 60 e 61,
+ * e retorna o tamanho total em bytes (setores × 512).
+ */
 uint64_t detect_disk_size() {
     outb(ATA_PRIMARY_IO + 6, 0xA0);
      

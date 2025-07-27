@@ -1,11 +1,16 @@
 #include <fs/file.h>
 #include <fs/fs.h>
 #include <kernel/terminal.h>
-#include <kernel/disk.h>
+#include <fs/disk.h>
 #include <lib/string.h>
 #include <lib/stdlib.h>
 #include <stdint.h>
 
+/**
+ * Lê um arquivo simples do disco ATA usando o nome extraído do caminho
+ * Busca o setor com fs_find, lê 512 bytes com ata_read_sector, copia 
+ * até o byte nulo para um buffer alocado e retorna
+ */
 char* read_file(const char* path) {
     const char* name = strrchr(path, '/');
     if (!name) name = path;
@@ -13,7 +18,7 @@ char* read_file(const char* path) {
 
     int sector = fs_find(name);
     if (sector < 0) {
-        terminal_print("Arquivo não encontrado: ");
+        terminal_print("File not found: ");
         terminal_print(name);
         terminal_print("\n");
         return NULL;
@@ -24,7 +29,7 @@ char* read_file(const char* path) {
 
     char* content = malloc(512);
     if (!content) {
-        terminal_print("Erro de memória.\n");
+        terminal_print("Memory error.\n");
         return NULL;
     }
 

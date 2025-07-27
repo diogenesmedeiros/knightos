@@ -18,6 +18,6 @@ void run_knightlang_file(const char* filename) {
         run_knightlang_script(code);
         free(code);
     } else {
-        terminal_print("Erro ao abrir script .knt\n");
+        terminal_print("Error opening .knt script\n");
     }
 }

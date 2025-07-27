@@ -1,5 +1,4 @@
-#include <commands/command_ls.h>
-#include <kernel/disk.h>
+#include <fs/disk.h>
 #include <kernel/terminal.h>
 #include <lib/string.h>
 
@@ -38,7 +37,7 @@ void list_directory(uint8_t sector_number, int depth) {
             }
             terminal_print("\n");
         } else {
-            terminal_print(" [Tipo desconhecido]\n");
+            terminal_print(" [Unknown type]\n");
         }
     }
 }

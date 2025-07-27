@@ -1,31 +1,56 @@
-#include <commands/command_login.h>
-#include <kernel/user.h>
 #include <kernel/terminal.h>
+#include <kernel/user.h>
+#include <drivers/keyboard.h>
+#include <lib/string.h>
+#include <commands/command.h>
 
-void cmd_login(const char* args) {
-    char name[MAX_USERNAME_LEN] = {0};
-    char pass[MAX_PASSWORD_LEN] = {0};
+void cmd_login() {
+    keyboard_clear_buffer();
 
-    int i = 0;
-    while (*args == ' ') args++;
-    while (*args && *args != ' ' && i < MAX_USERNAME_LEN - 1)
-        name[i++] = *args++;
-    name[i] = '\0';
+    char username[32];
+    char password[32];
+    
+    while (1) {
+        terminal_print("Username: ");
+        int pos = 0;
+        char c;
+        while (1) {
+            keyboard_poll();
+            if (!keyboard_has_char()) continue;
+            c = keyboard_get_char();
+            if (c == '\n') {
+                username[pos] = '\0';
+                terminal_putc('\n');
+                break;
+            }
+            if (pos < sizeof(username) - 1) {
+                username[pos++] = c;
+                terminal_putc(c);
+            }
+        }
 
-    while (*args == ' ') args++;
-    i = 0;
-    while (*args && i < MAX_PASSWORD_LEN - 1)
-        pass[i++] = *args++;
-    pass[i] = '\0';
+        terminal_print("Password: ");
+        pos = 0;
+        while (1) {
+            keyboard_poll();
+            if (!keyboard_has_char()) continue;
+            c = keyboard_get_char();
+            if (c == '\n') {
+                password[pos] = '\0';
+                terminal_putc('\n');
+                break;
+            }
+            if (pos < sizeof(password) - 1) {
+                password[pos++] = c;
+                terminal_putc('*');
+            }
+        }
 
-    if (name[0] == '\0' || pass[0] == '\0') {
-        terminal_print("Usage: login <name> <password>\n");
-        return;
+        if (user_login(username, password) == 0) {
+            terminal_print("Login successful.\n\n");
+            return;
+        } else {
+            terminal_print("Invalid username or password. Try again.\n\n");
+        }
     }
-
-    int res = user_login(name, pass);
-    if (res == 0)
-        terminal_print("Login successful.\n");
-    else
-        terminal_print("Invalid credentials.\n");
 }

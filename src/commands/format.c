@@ -1,6 +1,5 @@
-#include <commands/command_format.h>
 #include <kernel/terminal.h>
-#include <kernel/disk.h>
+#include <fs/disk.h>
 #include <lib/string.h>
 
 void cmd_format(const char* _) {

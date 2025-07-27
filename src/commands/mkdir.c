@@ -1,4 +1,6 @@
-#include <commands/command_mkdir.h>
+#include <kernel/terminal.h>
+#include <fs/disk.h>
+#include <lib/string.h>
 
 void cmd_mkdir(const char* name) {
     if (!name || strlen(name) == 0) {
