@@ -1,4 +1,4 @@
-#include <fs/disk.h>
+#include <drivers/ata.h>
 #include <kernel/terminal.h>
 #include <lib/string.h>
 

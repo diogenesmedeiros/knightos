@@ -9,15 +9,33 @@
  * espera até o disco estar pronto (bit DRQ ativado), e então lê os 256 words (16 bits cada) da porta de dados.
  */
 void ata_read_sector(uint32_t lba, uint8_t* buffer) {
+    /**
+     * 0x1F6: é o registrador de "drive/head".
+     * 0xE0: modo LBA + drive 0 (master).
+     * Pega os 4 bits altos do endereço LBA.
+     */
     outb(0x1F6, 0xE0 | ((lba >> 24) & 0x0F));
-    outb(0x1F2, 1);
-    outb(0x1F3, (uint8_t)(lba));
-    outb(0x1F4, (uint8_t)(lba >> 8));
-    outb(0x1F5, (uint8_t)(lba >> 16));
-    outb(0x1F7, 0x20);
 
+    // Vai ler 1 setor (512 bytes).
+    outb(0x1F2, 1);
+
+    outb(0x1F3, (uint8_t)(lba)); // bits 0..7
+    outb(0x1F4, (uint8_t)(lba >> 8)); // bits 8..15
+    outb(0x1F5, (uint8_t)(lba >> 16)); // bits 16..23
+    outb(0x1F7, 0x20); // 0x20: comando ATA "READ SECTOR(S)".
+
+    /**
+     * Espera disco sinalizar pronto para transferência de dados
+     * 0x08: bit DRQ (Data Request).
+     */
     while (!(inb(0x1F7) & 0x08));
 
+    /**
+     * Lê os 512 bytes do setor
+     * Cada inw(0x1F0) lê 16 bits (2 bytes) da porta de dados.
+     * 256 leituras × 2 bytes = 512 bytes = 1 setor.
+     * O resultado vai para o buffer.
+     */
     for (int i = 0; i < 256; i++) {
         ((uint16_t*)buffer)[i] = inw(0x1F0);
     }

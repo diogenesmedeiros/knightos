@@ -1,0 +1,1 @@
+int snprintf(char* buf, int size, const char* fmt, ...);

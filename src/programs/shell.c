@@ -1,11 +1,12 @@
 #include <kernel/terminal.h>
-#include <kernel/user.h>
+#include <user/user.h>
 #include <commands/command.h>
 #include <lib/string.h>
 #include <stddef.h>
 #include <drivers/keyboard.h>
 #include <programs/shell.h>
 #include <kernel/process.h>
+#include <drivers/io.h>
 
 #define MAX_INPUT 256
 #define HISTORY_SIZE 32
@@ -47,18 +48,28 @@ void shell_prompt() {
     const char* user = user_whoami();
     const char* dir = fs_get_current_directory();
 
-    terminal_print("[");
-    
+    terminal_print_color("[", 0x4, 0x0);
+    // Usuário
     if (strcmp(user, "none") != 0) {
-        terminal_print(user);
+        terminal_print_color(user, 0x2, 0x0);
     } else {
-        terminal_print("guest");
+        terminal_print_color("guest", 0x2, 0x0);
     }
+    terminal_print_color("]", 0x4, 0x0);
 
-    terminal_print("@knightos:");
-    terminal_print(dir);
-    terminal_print("]$ ");
+    terminal_print_color("@", 0xE, 0x0);
+
+    // Nome do PC
+    terminal_print_color("[", 0x4, 0x0);
+    terminal_print_color("knightos", 0x7, 0x0);
+    terminal_print_color("]", 0x4, 0x0);
+
+    // Diretório
+    terminal_print_color(":", 0x08, 0x0);
+    terminal_print_color(dir, 0x08, 0x0);
+    terminal_print_color("$ ", 0x08, 0x0);
 }
+
 
 void shell_execute(const char* cmd) {
     command_execute(cmd);
@@ -97,7 +108,8 @@ void shell_handle_special_key(int key) {
 
 static bool shell_handle_line(const char* line) {
     if (strcmp(line, "exit") == 0) {
-        return true;
+        while ((inb(0x64) & 0x02) != 0);
+        outb(0x64, 0xFE);
     }
     shell_execute(line);
     return false;

@@ -1,5 +1,5 @@
-#ifndef DISK_H
-#define DISK_H
+#ifndef ATA_H
+#define ATA_H
 
 #include <stdint.h>
 

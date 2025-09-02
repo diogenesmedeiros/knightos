@@ -1,16 +1,17 @@
 #include <fs/file.h>
 #include <fs/fs.h>
 #include <kernel/terminal.h>
-#include <fs/disk.h>
+#include <drivers/ata.h>
 #include <lib/string.h>
 #include <lib/stdlib.h>
+#include <lib/snprintf.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #define MAX_LINES 100
 #define MAX_LINE_LEN 128
-#define SCREEN_ROWS 25
 #define SCREEN_COLS 80
+#define SCREEN_ROWS 25
 
 static char lines[MAX_LINES][MAX_LINE_LEN];
 static int line_count = 1;
@@ -28,43 +29,37 @@ extern char keyboard_get_char();
 
 static void print_line_with_padding(const char* str) {
     int len = strlen(str);
-    terminal_print(str);
-    for (int i = len; i < SCREEN_COLS; i++) {
-        terminal_putc(' ');
-    }
+    if (len > SCREEN_COLS) len = SCREEN_COLS;
+    for (int i = 0; i < len; i++) terminal_putc(str[i]);
+    for (int i = len; i < SCREEN_COLS; i++) terminal_putc(' ');
     terminal_putc('\n');
 }
 
 static void print_line_of_chars(char c) {
-    for (int i = 0; i < SCREEN_COLS; i++) {
-        terminal_putc(c);
-    }
+    for (int i = 0; i < SCREEN_COLS; i++) terminal_putc(c);
     terminal_putc('\n');
 }
 
-static void editor_print_screen(const char* filename) {
+void editor_print_screen(const char* filename, char lines[][128], int line_count, int cursor_line, int cursor_col) {
     terminal_clear();
 
-    const char* header = " KnightEditor v1.0 - ";
+    char header[SCREEN_COLS + 1];
+    int n = snprintf(header, SCREEN_COLS + 1, " KnightEditor v1.0 - %s ", filename);
+    if (n > SCREEN_COLS) n = SCREEN_COLS;  // corta se necessário
+    int padding = (SCREEN_COLS - n) / 2;
+    for (int i = 0; i < padding; i++) terminal_putc(' ');
     terminal_print(header);
-    terminal_print(filename);
-    int header_len = strlen(header) + strlen(filename);
-    for (int i = header_len; i < SCREEN_COLS; i++) {
-        terminal_putc(' ');
-    }
+    for (int i = n + padding; i < SCREEN_COLS; i++) terminal_putc(' ');
     terminal_putc('\n');
 
     print_line_of_chars('-');
 
+    // Área de texto visível
     int max_visible_lines = SCREEN_ROWS - 4;
-
     for (int i = 0; i < max_visible_lines; i++) {
-        if (i < line_count) {
-            print_line_with_padding(lines[i]);
-        } else {
-            for (int j = 0; j < SCREEN_COLS; j++) {
-                terminal_putc(' ');
-            }
+        if (i < line_count) print_line_with_padding(lines[i]);
+        else {
+            for (int j = 0; j < SCREEN_COLS; j++) terminal_putc(' ');
             terminal_putc('\n');
         }
     }
@@ -74,6 +69,7 @@ static void editor_print_screen(const char* filename) {
     const char* footer = " Ctrl+X = exit | Enter = new line | Backspace = delete ";
     print_line_with_padding(footer);
 
+    if (cursor_line >= max_visible_lines) cursor_line = max_visible_lines - 1;
     update_cursor(cursor_line + 2, cursor_col);
 }
 
@@ -218,12 +214,14 @@ void editor_open(const char* filename) {
     if (line_count == 0) line_count = 1;
 
     free(content);
+
+    editor_print_screen(filename, lines, line_count, cursor_line, cursor_col);
 }
 
 
 void editor_run(const char* filename) {
     editor_open(filename);
-    editor_print_screen(filename);
+    editor_print_screen(filename, lines, line_count, cursor_line, cursor_col);
 
     while (1) {
         keyboard_poll();
@@ -249,6 +247,6 @@ void editor_run(const char* filename) {
             dirty = true;
         }
 
-        if (dirty) editor_print_screen(filename);
+        if (dirty) editor_print_screen(filename, lines, line_count, cursor_line, cursor_col);
     }
 }

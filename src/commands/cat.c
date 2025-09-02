@@ -1,6 +1,6 @@
 #include <fs/fs.h>
 #include <kernel/terminal.h>
-#include <fs/disk.h>
+#include <drivers/ata.h>
 #include <lib/string.h>
 #include <commands/command_clear.h>
 

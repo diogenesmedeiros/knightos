@@ -1,4 +1,4 @@
-#include <kernel/interrupts.h>
+#include <arch/x86/interrupts.h>
 #include <drivers/io.h>
 #include <lib/string.h>
 

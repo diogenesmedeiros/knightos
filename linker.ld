@@ -6,7 +6,7 @@ SECTIONS {
     kernel_start = .;
 
     .multiboot ALIGN(4K) : {
-        KEEP(*(.multiboot))
+        KEEP(*(.multiboot_header))
     }
 
     .text ALIGN(4K) : {

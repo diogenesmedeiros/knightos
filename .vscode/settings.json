@@ -40,6 +40,12 @@
         "api.h": "c",
         "ethernet.h": "c",
         "etharp.h": "c",
-        "netif.h": "c"
+        "netif.h": "c",
+        "editor.h": "c",
+        "vga.h": "c",
+        "multiboot.h": "c",
+        "framebuffer.h": "c",
+        "stdbool.h": "c",
+        "ata.h": "c"
     }
 }

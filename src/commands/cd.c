@@ -9,5 +9,4 @@ void cmd_cd(const char* arg) {
     }
 
     fs_set_current_directory(arg);
-    terminal_print("\n");
 }

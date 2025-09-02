@@ -1,4 +1,4 @@
-#include <kernel/user.h>
+#include <user/user.h>
 #include <kernel/terminal.h>
 #include <lib/string.h>
 #include <programs/shell.h>

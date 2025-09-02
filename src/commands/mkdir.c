@@ -1,6 +1,7 @@
 #include <kernel/terminal.h>
-#include <fs/disk.h>
+#include <drivers/ata.h>
 #include <lib/string.h>
+#include <fs/fs.h>
 
 void cmd_mkdir(const char* name) {
     if (!name || strlen(name) == 0) {
@@ -9,23 +10,29 @@ void cmd_mkdir(const char* name) {
     }
 
     uint8_t sector[512];
-    ata_read_sector(1, sector);
+    uint8_t dir_sector = fs_get_current_sector();
+    ata_read_sector(dir_sector, sector);
 
     uint8_t num_dirs = sector[0];
-    if (num_dirs >= 31) {
+    if (num_dirs >= 15) { // 512 bytes / 32 bytes por entrada - 1
         terminal_print("Directory limit reached.\n");
         return;
     }
 
+    // Checa se o nome já existe
     for (int i = 0; i < num_dirs; i++) {
-        if (strncmp((char*)&sector[1 + i * 16], name, 16) == 0) {
+        if (strncmp((char*)&sector[1 + i * 32], name, 15) == 0) {
             terminal_print("Directory already exists.\n");
             return;
         }
     }
 
-    strncpy((char*)&sector[1 + num_dirs * 16], name, 16);
-    sector[0] = num_dirs + 1;
+    uint8_t* entry = &sector[1 + num_dirs * 32];
+    memset(entry, 0, 32); // limpa a entrada
+    strncpy((char*)entry, name, 15); // nome
+    entry[16] = 0x01; // tipo = diretório
+    entry[17] = 2 + num_dirs; // atribui setor
 
-    ata_write_sector(1, sector);
+    sector[0] = num_dirs + 1;
+    ata_write_sector(dir_sector, sector);
 }

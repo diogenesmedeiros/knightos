@@ -1,7 +1,7 @@
 #include <lib/sha256.h>
 #include <lib/string.h>
-#include <fs/disk.h>
-#include <kernel/user.h>
+#include <drivers/ata.h>
+#include <user/user.h>
 
 typedef struct {
     char name[MAX_USERNAME_LEN];

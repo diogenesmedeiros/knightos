@@ -1,10 +1,10 @@
 #include <kernel/terminal.h>
-#include <fs/disk.h>
+#include <drivers/ata.h>
 #include <lib/string.h>
 
 void cmd_format(const char* _) {
     if (!user_is_root()) {
-        terminal_print("Permissão negada: requer root.\n");
+        terminal_print("Permission denied: requires root.\n");
         return;
     }
 

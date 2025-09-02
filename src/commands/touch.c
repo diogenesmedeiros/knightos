@@ -1,6 +1,6 @@
 #include <kernel/terminal.h>
-#include <kernel/memory.h>  // necessário para alloc_page()
-#include <fs/disk.h>
+#include <kernel/memory.h>
+#include <drivers/ata.h>
 #include <fs/fs.h>
 #include <lib/string.h>
 #include <lib/utils.h>
@@ -35,17 +35,8 @@ void cmd_touch(const char* args) {
         return;
     }
 
-    uint8_t* sector = (uint8_t*)alloc_page();
-    if (!sector) {
-        terminal_print("Failed to allocate memory for directory.\n");
-        return;
-    }
-
-    uint8_t* buf = (uint8_t*)alloc_page();
-    if (!buf) {
-        terminal_print("Failed to allocate memory for data.\n");
-        return;
-    }
+    uint8_t sector[512];
+    uint8_t buf[512];
 
     uint8_t parent_sector = fs_get_current_sector();
     ata_read_sector(parent_sector, sector);
@@ -56,51 +47,30 @@ void cmd_touch(const char* args) {
         return;
     }
 
+    // Verifica se já existe
     for (int i = 0; i < num_entries; i++) {
-        char* entry = (char*)&sector[1 + i * 32];
-        if (strncmp(entry, name, 15) == 0) {
+        char* entry_name = (char*)&sector[1 + i * 32];
+        if (strncmp(entry_name, name, 15) == 0) {
             terminal_print("File or directory already exists.\n");
             return;
         }
     }
-
-    int data_sector = -1;
-    for (int s = 2; s < 255; s++) {
-        ata_read_sector(s, buf);
-        int vazio = 1;
-        for (int j = 0; j < 512; j++) {
-            if (buf[j] != 0) {
-                vazio = 0;
-                break;
-            }
-        }
-        if (vazio) {
-            data_sector = s;
-            break;
-        }
-    }
-
-    if (data_sector == -1) {
-        terminal_print("No free sectors.\n");
-        return;
-    }
-
+    
     uint8_t* entry = &sector[1 + num_entries * 32];
     memset(entry, 0, 32);
     strncpy((char*)entry, name, 15);
-    entry[15] = '\0';
-    entry[16] = 0x02;
-    entry[17] = data_sector;
+    entry[16] = 0x02; // tipo arquivo
+    entry[17] = fs_get_current_directory();
 
     sector[0] = num_entries + 1;
     ata_write_sector(parent_sector, sector);
 
+    // Escreve conteúdo do arquivo
     memset(buf, 0, 512);
     if (strlen(content) > 0) {
         strncpy((char*)buf, content, 512);
     }
-    ata_write_sector(data_sector, buf);
+    ata_write_sector(fs_get_current_directory(), buf);
 
-    free_page((uint32_t)sector);
-    free_page((uint32_t)buf);
+    terminal_print("File created successfully.\n");
 }

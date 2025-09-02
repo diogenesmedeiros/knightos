@@ -1,5 +1,5 @@
 #include <kernel/terminal.h>
-#include <kernel/user.h>
+#include <user/user.h>
 #include <drivers/keyboard.h>
 #include <lib/string.h>
 #include <commands/command.h>
@@ -11,7 +11,7 @@ void cmd_login() {
     char password[32];
     
     while (1) {
-        terminal_print("Username: ");
+        terminal_print_color("Username: ", 0x3, 0x0);
         int pos = 0;
         char c;
         while (1) {
@@ -29,7 +29,7 @@ void cmd_login() {
             }
         }
 
-        terminal_print("Password: ");
+        terminal_print_color("Password: ", 0x3, 0x0);
         pos = 0;
         while (1) {
             keyboard_poll();
@@ -47,10 +47,10 @@ void cmd_login() {
         }
 
         if (user_login(username, password) == 0) {
-            terminal_print("Login successful.\n\n");
+            terminal_print_color("Login successful.\n\n", 0x2, 0x0);
             return;
         } else {
-            terminal_print("Invalid username or password. Try again.\n\n");
+            terminal_print_color("Invalid username or password. Try again.\n\n", 0x4, 0x0);
         }
     }
 }
