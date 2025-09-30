@@ -2,12 +2,16 @@
 #include <kernel/terminal.h>
 #include <drivers/ata.h>
 #include <lib/string.h>
+#include <fs/journal.h>
 
 static void rm_recursive(uint8_t sector_num) {
+    if (sector_num == 0) return;
+
     uint8_t sector[512];
     ata_read_sector(sector_num, sector);
 
     uint8_t num_entries = sector[0];
+    if (num_entries > 15) num_entries = 15;
 
     for (int i = 0; i < num_entries; i++) {
         uint8_t* entry = &sector[1 + i * 32];
@@ -16,10 +20,17 @@ static void rm_recursive(uint8_t sector_num) {
 
         if (tipo == 0x01) {
             rm_recursive(entry_sector);
+        } else if (tipo == 0x02) {
+            if (entry_sector != 0) {
+                uint8_t empty[512] = {0};
+                ata_write_sector(entry_sector, empty);
+            }
         }
 
-        uint8_t empty[512] = {0};
-        ata_write_sector(entry_sector, empty);
+        if (tipo == 0x01 && entry_sector != 0) {
+            uint8_t empty[512] = {0};
+            ata_write_sector(entry_sector, empty);
+        }
     }
 
     uint8_t empty[512] = {0};
@@ -47,6 +58,12 @@ void cmd_rm(const char* name) {
             uint8_t tipo = entry[16];
             uint8_t entry_sector = entry[17];
 
+            int journal_idx = write_journal(JOURNAL_RM, 0, entry_sector, name);
+            if (journal_idx < 0) {
+                terminal_print("Journal full, cannot remove file/folder.\n");
+                return;
+            }
+
             if (tipo == 0x01) {
                 rm_recursive(entry_sector);
             } else {
@@ -61,7 +78,7 @@ void cmd_rm(const char* name) {
             sector[0] = num_entries - 1;
             ata_write_sector(current, sector);
 
-            terminal_print("Removed successfully.\n");
+            mark_journal_committed(journal_idx);
             return;
         }
     }

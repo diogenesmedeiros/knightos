@@ -1,10 +1,32 @@
 #include <drivers/vga.h>
+#include <stdarg.h>
 
-void terminal_init() { vga_init(); }
-void terminal_clear() { vga_clear(); }
-void terminal_putc(char c) { vga_putc(c); }
-void terminal_print(const char* str) { vga_print(str); }
-void update_cursor(int row, int col) { vga_update_cursor(row, col); }
+void terminal_init() {
+    vga_init();
+}
+
+void terminal_clear() {
+    vga_clear();
+}
+
+void terminal_putc(char c) {
+    vga_putc(c);
+}
+
+void terminal_print(const char* str) {
+    vga_print(str);
+}
+
+void terminal_printf(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    vga_printf(fmt, args);
+    va_end(args);
+}
+
+void update_cursor(int row, int col) {
+    vga_update_cursor(row, col); 
+}
 
 void terminal_print_int(int value) {
     char buffer[32];

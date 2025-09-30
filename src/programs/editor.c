@@ -17,6 +17,7 @@ static char lines[MAX_LINES][MAX_LINE_LEN];
 static int line_count = 1;
 static int cursor_line = 0;
 static int cursor_col = 0;
+static int scroll_offset = 0;
 
 extern void terminal_clear();
 extern void terminal_print(const char* str);
@@ -40,12 +41,23 @@ static void print_line_of_chars(char c) {
     terminal_putc('\n');
 }
 
-void editor_print_screen(const char* filename, char lines[][128], int line_count, int cursor_line, int cursor_col) {
+static void editor_print_status(const char* filename) {
+    char status[SCREEN_COLS + 1];
+    int n = snprintf(status, SCREEN_COLS + 1,
+        "File: %s  Line: %d/%d  Col: %d  Ctrl+X = exit | Ctrl+S = save",
+        filename, cursor_line + 1, line_count, cursor_col + 1);
+    if (n > SCREEN_COLS) n = SCREEN_COLS;
+    terminal_print(status);
+    for (int i = n; i < SCREEN_COLS; i++) terminal_putc(' ');
+    terminal_putc('\n');
+}
+
+void editor_print_screen(const char* filename) {
     terminal_clear();
 
     char header[SCREEN_COLS + 1];
-    int n = snprintf(header, SCREEN_COLS + 1, " KnightEditor v1.0 - %s ", filename);
-    if (n > SCREEN_COLS) n = SCREEN_COLS;  // corta se necessário
+    int n = snprintf(header, SCREEN_COLS + 1, " KnightEditor v2.0 - %s ", filename);
+    if (n > SCREEN_COLS) n = SCREEN_COLS;
     int padding = (SCREEN_COLS - n) / 2;
     for (int i = 0; i < padding; i++) terminal_putc(' ');
     terminal_print(header);
@@ -54,23 +66,20 @@ void editor_print_screen(const char* filename, char lines[][128], int line_count
 
     print_line_of_chars('-');
 
-    // Área de texto visível
     int max_visible_lines = SCREEN_ROWS - 4;
+    int start = scroll_offset;
+
     for (int i = 0; i < max_visible_lines; i++) {
-        if (i < line_count) print_line_with_padding(lines[i]);
-        else {
-            for (int j = 0; j < SCREEN_COLS; j++) terminal_putc(' ');
-            terminal_putc('\n');
-        }
+        if (start + i < line_count) print_line_with_padding(lines[start + i]);
+        else print_line_with_padding("");
     }
 
     print_line_of_chars('-');
 
-    const char* footer = " Ctrl+X = exit | Enter = new line | Backspace = delete ";
-    print_line_with_padding(footer);
+    editor_print_status(filename);
 
-    if (cursor_line >= max_visible_lines) cursor_line = max_visible_lines - 1;
-    update_cursor(cursor_line + 2, cursor_col);
+    int cursor_screen_row = cursor_line - scroll_offset + 2; // +2 para header e linha de separação
+    update_cursor(cursor_screen_row, cursor_col);
 }
 
 static void editor_insert_char(char c) {
@@ -131,35 +140,37 @@ static void editor_backspace() {
 static void editor_move_cursor_up() {
     if (cursor_line > 0) {
         cursor_line--;
-        int len = strlen(lines[cursor_line]);
-        if (cursor_col > len) cursor_col = len;
+        if (cursor_col > strlen(lines[cursor_line])) cursor_col = strlen(lines[cursor_line]);
+        if (cursor_line < scroll_offset) scroll_offset = cursor_line;
     }
 }
 
 static void editor_move_cursor_down() {
     if (cursor_line < line_count - 1) {
         cursor_line++;
-        int len = strlen(lines[cursor_line]);
-        if (cursor_col > len) cursor_col = len;
+        if (cursor_col > strlen(lines[cursor_line])) cursor_col = strlen(lines[cursor_line]);
+        int max_visible_lines = SCREEN_ROWS - 4;
+        if (cursor_line >= scroll_offset + max_visible_lines) scroll_offset = cursor_line - max_visible_lines + 1;
     }
 }
 
 static void editor_move_cursor_left() {
-    if (cursor_col > 0) {
-        cursor_col--;
-    } else if (cursor_line > 0) {
+    if (cursor_col > 0) cursor_col--;
+    else if (cursor_line > 0) {
         cursor_line--;
         cursor_col = strlen(lines[cursor_line]);
+        if (cursor_line < scroll_offset) scroll_offset = cursor_line;
     }
 }
 
 static void editor_move_cursor_right() {
     int len = strlen(lines[cursor_line]);
-    if (cursor_col < len) {
-        cursor_col++;
-    } else if (cursor_line < line_count - 1) {
+    if (cursor_col < len) cursor_col++;
+    else if (cursor_line < line_count - 1) {
         cursor_line++;
         cursor_col = 0;
+        int max_visible_lines = SCREEN_ROWS - 4;
+        if (cursor_line >= scroll_offset + max_visible_lines) scroll_offset = cursor_line - max_visible_lines + 1;
     }
 }
 
@@ -189,9 +200,7 @@ void editor_save(const char* filename) {
 }
 
 void editor_open(const char* filename) {
-    for (int i = 0; i < MAX_LINES; i++) {
-        lines[i][0] = '\0';
-    }
+    for (int i = 0; i < MAX_LINES; i++) lines[i][0] = '\0';
 
     char* content = read_file(filename);
     if (!content) return;
@@ -200,6 +209,7 @@ void editor_open(const char* filename) {
     line_count = 0;
     cursor_line = 0;
     cursor_col = 0;
+    scroll_offset = 0;
 
     while (content[i] && line_count < MAX_LINES) {
         int len = 0;
@@ -214,28 +224,33 @@ void editor_open(const char* filename) {
     if (line_count == 0) line_count = 1;
 
     free(content);
-
-    editor_print_screen(filename, lines, line_count, cursor_line, cursor_col);
 }
-
 
 void editor_run(const char* filename) {
     editor_open(filename);
-    editor_print_screen(filename, lines, line_count, cursor_line, cursor_col);
+
+    // Ajusta scroll para o começo
+    scroll_offset = 0;
+    cursor_line = 0;
+    cursor_col = 0;
+
+    // Print inicial do conteúdo carregado
+    editor_print_screen(filename);
 
     while (1) {
         keyboard_poll();
-
         if (!keyboard_has_char()) continue;
 
         char c = keyboard_get_char();
         bool dirty = false;
 
-        if (c == 24) {
-            terminal_clear();
+        if (c == 24) { // Ctrl+X
             editor_save(filename);
-            terminal_print("Leaving the editor...\n");
+            terminal_print("Exiting editor...\n");
             break;
+        } else if (c == 19) { // Ctrl+S
+            editor_save(filename);
+            dirty = true;
         } else if (c == '\r' || c == '\n') {
             editor_new_line();
             dirty = true;
@@ -245,8 +260,16 @@ void editor_run(const char* filename) {
         } else if (c >= 32 && c <= 126) {
             editor_insert_char(c);
             dirty = true;
+        } else if (c == 0 || c == 0xE0) { // Teclas especiais
+            char code = keyboard_get_char();
+            switch(code) {
+                case 72: editor_move_cursor_up(); dirty = true; break;    // UP
+                case 80: editor_move_cursor_down(); dirty = true; break;  // DOWN
+                case 75: editor_move_cursor_left(); dirty = true; break;  // LEFT
+                case 77: editor_move_cursor_right(); dirty = true; break; // RIGHT
+            }
         }
 
-        if (dirty) editor_print_screen(filename, lines, line_count, cursor_line, cursor_col);
+        if (dirty) editor_print_screen(filename);
     }
 }

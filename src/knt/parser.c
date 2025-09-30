@@ -82,25 +82,23 @@ Statement* parse_block() {
 
     while (peek_token().type != TOKEN_RBRACE && peek_token().type != TOKEN_EOF) {
         Token t = peek_token();
+        Statement* s = NULL;
+
         if (t.type == TOKEN_IDENTIFIER) {
             Token name = advance_token();
             if (peek_token().type == TOKEN_ASSIGN) {
                 advance_token(); // =
                 Token val = advance_token();
-                Statement* s = malloc(sizeof(Statement));
+                s = malloc(sizeof(Statement));
                 s->type = STMT_VAR_ASSIGN;
                 strcpy(s->name, name.lexeme);
                 strcpy(s->value, val.lexeme);
-                s->next = NULL;
-
-                if (!head) head = tail = s;
-                else tail = tail->next = s;
             } else if (peek_token().type == TOKEN_LPAREN) {
                 advance_token(); // (
-                Token val = advance_token(); // value inside the print
+                Token val = advance_token(); 
                 advance_token(); // )
 
-                Statement* s = malloc(sizeof(Statement));
+                s = malloc(sizeof(Statement));
                 if (strcmp(name.lexeme, "print") == 0) {
                     s->type = STMT_PRINT;
                     strcpy(s->value, val.lexeme);
@@ -108,15 +106,20 @@ Statement* parse_block() {
                     s->type = STMT_FUNC_CALL;
                     strcpy(s->name, name.lexeme);
                 }
-                s->next = NULL;
-
-                if (!head) head = tail = s;
-                else tail = tail->next = s;
             }
+        }
+
+        if (s) {
+            s->next = NULL;
+            if (!head) head = tail = s;
+            else tail = tail->next = s;
+            tail = s;
         } else {
-            advance_token(); // ignore
+            advance_token(); // ignorar token
         }
     }
+
+    if (peek_token().type == TOKEN_RBRACE) advance_token(); // consome }
 
     return head;
 }

@@ -1,12 +1,34 @@
 #include <stdint.h>
 #include <kernel/memory.h>
 #include <lib/string.h>
+#include <stddef.h>
 
 #define PAGE_SIZE 4096
 
 static uint64_t g_total_ram = 0;
 static uint32_t g_max_pages = 0;
 static uint8_t* g_page_bitmap = 0;
+
+#define KERNEL_HEAP_START 0x01000000
+#define KERNEL_HEAP_SIZE  0x01000000
+
+static uint8_t *heap_base = (uint8_t*)KERNEL_HEAP_START;
+static size_t heap_offset = 0;
+
+void* kmalloc(size_t size) {
+    // Alinhamento de 16 bytes
+    size = (size + 15) & ~15;
+
+    if (heap_offset + size > KERNEL_HEAP_SIZE) {
+        return NULL; // sem memória
+    }
+
+    void *ptr = heap_base + heap_offset;
+    heap_offset += size;
+
+    memset(ptr, 0, size);
+    return ptr;
+}
 
 // Marca a página 'page' como usada no bitmap global de páginas (g_page_bitmap)
 static inline void set_page(uint32_t page) {

@@ -4,6 +4,7 @@
 #include <fs/fs.h>
 #include <lib/string.h>
 #include <lib/utils.h>
+#include <fs/journal.h>
 
 void cmd_touch(const char* args) {
     if (!args || strlen(args) == 0) {
@@ -55,6 +56,14 @@ void cmd_touch(const char* args) {
             return;
         }
     }
+
+    uint8_t target_sector = fs_get_current_directory();
+    int journal_idx = write_journal(JOURNAL_CREATE_FILE, parent_sector, target_sector, name);
+    if (journal_idx < 0) {
+        terminal_print("Journal full, cannot create file.\n");
+        return;
+    }
+
     
     uint8_t* entry = &sector[1 + num_entries * 32];
     memset(entry, 0, 32);
@@ -72,5 +81,6 @@ void cmd_touch(const char* args) {
     }
     ata_write_sector(fs_get_current_directory(), buf);
 
+    mark_journal_committed(journal_idx);
     terminal_print("File created successfully.\n");
 }

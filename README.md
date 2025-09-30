@@ -70,3 +70,9 @@ Este projeto é **educacional**, com foco em:
 
 # Participe!
 Sinta-se livre para dar sugestões, reportar bugs ou propor novas funcionalidades. Todos podem colaborar para tornar o KnightOS um ambiente de aprendizado cada vez mais completo.
+
+
+
+sudo ip tuntap add dev tap0 mode tap
+sudo ip link set tap0 up
+sudo ip addr add 192.168.1.100/24 dev tap0

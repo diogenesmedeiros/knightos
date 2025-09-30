@@ -48,6 +48,7 @@ void cmd_login() {
 
         if (user_login(username, password) == 0) {
             terminal_print_color("Login successful.\n\n", 0x2, 0x0);
+            terminal_clear();
             return;
         } else {
             terminal_print_color("Invalid username or password. Try again.\n\n", 0x4, 0x0);

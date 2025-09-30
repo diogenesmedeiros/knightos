@@ -97,13 +97,8 @@ void vga_print(const char* str) {
     while (*str) vga_putc(*str++);
 }
 
-// Função printf básica: suporta %c, %s, %d, %x
-void vga_printf(const char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-
+void vga_vprintf(const char* fmt, va_list args) {
     char buffer[32];
-
     for (size_t i = 0; fmt[i]; i++) {
         if (fmt[i] == '%') {
             i++;
@@ -128,7 +123,6 @@ void vga_printf(const char* fmt, ...) {
                             buffer[len++] = '0' + (v % 10);
                             v /= 10;
                         }
-                        // inverter
                         for (int j = 0; j < len/2; j++) {
                             char t = buffer[j];
                             buffer[j] = buffer[len-1-j];
@@ -160,6 +154,11 @@ void vga_printf(const char* fmt, ...) {
             vga_putc(fmt[i]);
         }
     }
+}
 
+void vga_printf(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    vga_vprintf(fmt, args);
     va_end(args);
 }

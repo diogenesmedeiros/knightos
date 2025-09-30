@@ -46,6 +46,10 @@
         "multiboot.h": "c",
         "framebuffer.h": "c",
         "stdbool.h": "c",
-        "ata.h": "c"
+        "ata.h": "c",
+        "rtl8139.h": "c",
+        "net.h": "c",
+        "journal.h": "c",
+        "info.h": "c"
     }
 }

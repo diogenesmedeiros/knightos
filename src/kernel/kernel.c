@@ -9,7 +9,8 @@
 #include <lib/string.h>
 #include <kernel/kernel.h>
 #include <stdbool.h>
-#include <kernel/process.h>
+#include <drivers/rtl8139.h>
+#include <config/info.h>
 
 extern uint8_t kernel_start[], kernel_end[];
 
@@ -25,6 +26,8 @@ uint64_t g_total_ram = 0;
 void kernel_main(uint32_t magic, uint32_t multiboot_info_addr)
 {
     terminal_init();
+    rtl8139_init();
+    dhcp_init();
 
     g_total_ram = detect_memory(magic, multiboot_info_addr);
 
@@ -33,30 +36,34 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info_addr)
     user_init();
     register_default_commands();
 
-    process_init();
-
-    terminal_print("KnightOS 0.2a\nCopyright (c) Soft Knight. All rights reserved.\n\n");
-
     keyboard_clear_buffer();
-
-    int shell_pid = process_create(shell_run, "Shell");
-    if (shell_pid < 0)
-    {
-        terminal_print("failed to create shell process\n");
-        while (1)
-        {
-        }
-    }
 
     while (strcmp(user_whoami(), "none") == 0)
     {
+        const char* ascii_knight[] = {
+            "  ,--. ,--.        ,--.       ,--.       ,--.   ,-----.  ,---.   ",
+            "  |  .'   /,--,--, `--' ,---. |  ,---. ,-'  '-.'  .-.  ''   .-'  ",
+            "  |  .   ' |      \\,--.| .-. ||  .-.  |'-.  .-'|  | |  |`.  `-.  ",
+            "  |  |\\   \\|  ||  ||  |' '-' '|  | |  |  |  |  '  '-'  '.-'    | ",
+            "  `--' '--'`--''--'`--'.`-  / `--' `--'  `--'   `-----' `-----'  ",
+            "                       `---'                                      "
+        };
+        
+        int knight_lines = sizeof(ascii_knight) / sizeof(ascii_knight[0]);
+
+        for (int i = 0; i < knight_lines; i++) {
+            terminal_print_color(ascii_knight[i], 0x2, 0x0); // ciano sobre preto
+            terminal_print("\n");
+        }
+
         cmd_login();
     }
 
-    process_schedule();
+    terminal_print("KnightOS 0.0.2\nCopyright (c) Soft Knight. All rights reserved.\n\n");
 
     while (1)
     {
-        process_yield();
+        handle_icmp_reply();
+        shell_run();
     }
 }

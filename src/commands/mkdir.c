@@ -2,6 +2,7 @@
 #include <drivers/ata.h>
 #include <lib/string.h>
 #include <fs/fs.h>
+#include <fs/journal.h>
 
 void cmd_mkdir(const char* name) {
     if (!name || strlen(name) == 0) {
@@ -27,6 +28,13 @@ void cmd_mkdir(const char* name) {
         }
     }
 
+    uint8_t new_sector = 2 + num_dirs;
+    int journal_idx = write_journal(JOURNAL_MKDIR, dir_sector, new_sector, name);
+    if (journal_idx < 0) {
+        terminal_print("Journal full, cannot create directory.\n");
+        return;
+    }
+
     uint8_t* entry = &sector[1 + num_dirs * 32];
     memset(entry, 0, 32); // limpa a entrada
     strncpy((char*)entry, name, 15); // nome
@@ -35,4 +43,6 @@ void cmd_mkdir(const char* name) {
 
     sector[0] = num_dirs + 1;
     ata_write_sector(dir_sector, sector);
+
+    mark_journal_committed(journal_idx);
 }

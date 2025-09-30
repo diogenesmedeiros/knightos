@@ -1,0 +1,1 @@
+void cmd_journal(const char* _);

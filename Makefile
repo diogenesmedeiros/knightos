@@ -21,6 +21,7 @@ ASM_OBJECTS_S := $(patsubst $(SRC)/%.s, $(BUILD)/%.o, $(ASM_SOURCES_S))
 KERNEL_OBJECTS := $(C_OBJECTS) $(ASM_OBJECTS_ASM) $(ASM_OBJECTS_S)
 
 KERNEL_BIN := $(BUILD)/kernel.bin
+DISK_IMG := disk.img
 
 all: $(ISO_NAME)
 
@@ -50,7 +51,11 @@ $(ISO_NAME): $(KERNEL_BIN) boot/grub/grub.cfg
 
 run: $(ISO_NAME)
 	qemu-system-i386 -enable-kvm -cpu host \
-		-m 2048 -netdev user,id=n1 -device e1000,netdev=n1 -hda disk.img -cdrom $(ISO_NAME)
+		-m 2048 \
+		-netdev user,id=net0 \
+		-device rtl8139,netdev=net0,mac=52:54:00:12:34:56 \
+		-hda $(DISK_IMG) \
+		-cdrom $(ISO_NAME)
 
 clean:
 	rm -rf isodir $(BUILD) $(ISO_NAME)
